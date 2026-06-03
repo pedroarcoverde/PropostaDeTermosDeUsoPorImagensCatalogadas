@@ -20,6 +20,11 @@ jobs:
         uses: superfly/flyctl-actions@v1
         with:
           version: latest
+      - name: Create Fly app (if missing)
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+        run: |
+          flyctl apps create "${{ secrets.FLY_APP_NAME }}" || true
       - name: Deploy to Fly
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
