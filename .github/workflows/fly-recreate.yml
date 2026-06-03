@@ -1,0 +1,33 @@
+name: Recreate Fly app and deploy
+on:
+  workflow_dispatch: {}
+
+jobs:
+  recreate-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Install flyctl
+        run: |
+          curl -L https://fly.io/install.sh | sudo env FLYCTL_INSTALL=/usr/local sh
+          /usr/local/bin/flyctl version
+      - name: Authenticate Fly
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+        run: |
+          /usr/local/bin/flyctl auth login --access-token "$FLY_API_TOKEN"
+      - name: Destroy existing app (if any)
+        env:
+          FLY_APP_NAME: ${{ secrets.FLY_APP_NAME }}
+        run: |
+          /usr/local/bin/flyctl apps destroy "$FLY_APP_NAME" --confirm "$FLY_APP_NAME" || true
+      - name: Create app
+        env:
+          FLY_APP_NAME: ${{ secrets.FLY_APP_NAME }}
+        run: |
+          /usr/local/bin/flyctl apps create "$FLY_APP_NAME" --region iad || true
+      - name: Deploy
+        env:
+          FLY_APP_NAME: ${{ secrets.FLY_APP_NAME }}
+        run: |
+          /usr/local/bin/flyctl deploy --config fly.toml --app "$FLY_APP_NAME"
