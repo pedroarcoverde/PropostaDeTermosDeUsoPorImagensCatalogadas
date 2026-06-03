@@ -1,0 +1,65 @@
+@model IEnumerable<ConsentTelemetry.Models.ConsentRecord>
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logs de Consentimento</title>
+    <style>
+        body { margin:0; font-family:'Segoe UI',sans-serif; background:#eef2ff; color:#111827; }
+        .page { padding:2rem; }
+        .panel { background:#fff; border-radius:18px; padding:2rem; box-shadow:0 20px 60px rgba(15,23,42,.08); }
+        h1 { margin-top:0; }
+        table { width:100%; border-collapse:collapse; margin-top:1.5rem; }
+        th, td { padding:0.9rem 0.8rem; text-align:left; border-bottom:1px solid #e2e8f0; }
+        th { background:#f8fafc; color:#0f172a; }
+        tbody tr:hover { background:#f8fafc; }
+        .empty { color:#475569; }
+        .actions { margin-top:1.5rem; display:flex; justify-content:flex-end; }
+        .button { padding:0.85rem 1.2rem; border:none; border-radius:12px; background:#2563eb; color:#fff; text-decoration:none; font-weight:700; }
+    </style>
+</head>
+<body>
+<div class="page">
+    <section class="panel">
+        <h1>Logs de Consentimento</h1>
+        @if (!Model.Any())
+        {
+            <p class="empty">Nenhum log registrado ainda.</p>
+        }
+        else
+        {
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Tipo de termo</th>
+                        <th>Resposta</th>
+                        <th>Tempo (ms)</th>
+                        <th>Data/Hora</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@item.Id</td>
+                            <td>@item.ExperimentalGroup</td>
+                            <td>@(item.HasAccepted ? "Aceito" : "Rejeitado")</td>
+                            <td>@item.LatencyMilliseconds</td>
+                            <td>@item.CreatedAt.ToString("g")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        <div class="actions">
+            <a class="button" href="@Url.Action("Index", "Home")">Voltar</a>
+        </div>
+    </section>
+</div>
+</body>
+</html>
