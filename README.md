@@ -1,3 +1,55 @@
+# PropostaDeTermosDeUsoPorImagensCatalogadas
+
+![Build](https://github.com/pedroarcoverde/PropostaDeTermosDeUsoPorImagensCatalogadas/actions/workflows/ci.yml/badge.svg)
+![Latest Release](https://img.shields.io/github/v/release/pedroarcoverde/PropostaDeTermosDeUsoPorImagensCatalogadas)
+
+Aplicação ASP.NET Core para testar variantes visuais de termos de uso e coletar telemetria (aceite/rejeição + tempo de leitura).
+
+Principais arquivos
+- `ConsentTelemetry.csproj`, `ConsentTelemetry.sln`
+- Código: `Controllers/`, `Data/`, `Models/`, `Interfaces/`, `Views/`, `wwwroot/`
+
+Banco de dados
+- Banco local SQLite: `consentlogs.db` (arquivo no diretório do projeto).
+
+Pré-requisitos
+- .NET 10 SDK instalado: https://dotnet.microsoft.com/en-us/download
+
+Como executar localmente
+```powershell
+cd "c:\Users\pichau\OneDrive\Documentos\TCC"
+dotnet restore
+dotnet build
+dotnet run --urls http://localhost:5000
+# abrir http://localhost:5000 no navegador
+```
+
+Endpoints principais
+- `POST /api/consent/log` — registra um log (JSON conforme `ConsentLogDto`).
+- `GET /api/consent` — lista registros.
+- `GET /api/consent/{id}` — obter registro por id.
+- `GET /api/health` — health check.
+
+UI
+- `http://localhost:5000/` — página de seleção de termo (Index).
+- `TermosDeUso` — páginas de termo variante A ou B (acessadas pela seleção).
+- `Home/Logs` — painel com tabela dos registros.
+
+Publicar no GitHub
+- Repositório público: `PropostaDeTermosDeUsoPorImagensCatalogadas` (já criado).
+
+Comandos úteis
+```bash
+# ver remotes
+git remote -v
+
+# verificar status e últimos commits
+git status
+git log --oneline -n 5
+```
+
+---
+Arquivo atualizado pelo assistente para incluir badges e instruções rápidas.
 # ConsentTelemetry
 
 API simples para coleta de telemetria de consentimento (ex.: logs de aceite/recusa).
