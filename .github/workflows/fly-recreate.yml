@@ -5,6 +5,8 @@ on:
 jobs:
   recreate-and-deploy:
     runs-on: ubuntu-latest
+    env:
+      FLY_APP_NAME: ${{ secrets.FLY_APP_NAME }}
     steps:
       - uses: actions/checkout@v5
       - name: Install flyctl
@@ -25,15 +27,15 @@ jobs:
         env:
           FLY_APP_NAME: ${{ secrets.FLY_APP_NAME }}
         run: |
-          /usr/local/bin/flyctl apps destroy "$FLY_APP_NAME" --yes || true
+          /usr/local/bin/flyctl apps destroy "${FLY_APP_NAME:-propostadetermosdeusoporimagenscatalogadas}" --yes || true
       - name: Create app
         env:
           FLY_APP_NAME: ${{ secrets.FLY_APP_NAME }}
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
         run: |
-          /usr/local/bin/flyctl apps create --name "$FLY_APP_NAME" -y || true
+          /usr/local/bin/flyctl apps create --name "${FLY_APP_NAME:-propostadetermosdeusoporimagenscatalogadas}" -y || true
       - name: Deploy
         env:
           FLY_APP_NAME: ${{ secrets.FLY_APP_NAME }}
         run: |
-          /usr/local/bin/flyctl deploy --config fly.toml --app "$FLY_APP_NAME"
+          /usr/local/bin/flyctl deploy --config fly.toml --app "${FLY_APP_NAME:-propostadetermosdeusoporimagenscatalogadas}"
