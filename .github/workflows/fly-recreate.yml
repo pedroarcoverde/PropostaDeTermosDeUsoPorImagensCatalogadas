@@ -20,12 +20,12 @@ jobs:
         env:
           FLY_APP_NAME: ${{ secrets.FLY_APP_NAME }}
         run: |
-          /usr/local/bin/flyctl apps destroy "$FLY_APP_NAME" --confirm "$FLY_APP_NAME" || true
+          /usr/local/bin/flyctl apps destroy "$FLY_APP_NAME" --yes || true
       - name: Create app
         env:
           FLY_APP_NAME: ${{ secrets.FLY_APP_NAME }}
         run: |
-          /usr/local/bin/flyctl apps create "$FLY_APP_NAME" --region iad || true
+          /usr/local/bin/flyctl apps create "$FLY_APP_NAME" || true
       - name: Deploy
         env:
           FLY_APP_NAME: ${{ secrets.FLY_APP_NAME }}
