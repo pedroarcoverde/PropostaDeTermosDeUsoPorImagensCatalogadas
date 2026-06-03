@@ -17,7 +17,7 @@ Pré-requisitos
 
 Como executar localmente
 ```powershell
-cd "c:\Users\pichau\OneDrive\Documentos\TCC"
+cd "c:caminho do projeto"
 dotnet restore
 dotnet build
 dotnet run --urls http://localhost:5000
@@ -93,7 +93,7 @@ Pré-requisitos
 
 Como executar localmente
 ```powershell
-cd "c:\Users\pichau\OneDrive\Documentos\TCC"
+cd "c:caminho do projeto"
 dotnet restore
 dotnet build
 dotnet run --urls http://localhost:5000
