@@ -4,59 +4,202 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Termos de Uso</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        body { margin:0; font-family:'Segoe UI',sans-serif; background:#f8fafc; color:#0f172a; }
-        .page { display:flex; min-height:100vh; align-items:center; justify-content:center; padding:2rem; }
-        .card { width:100%; max-width:860px; background:#fff; border-radius:18px; padding:2rem; box-shadow:0 20px 70px rgba(15,23,42,.08); }
-        h1 { margin:0 0 1rem; font-size:2rem; }
-        .term-content { margin:1.5rem 0; color:#334155; line-height:1.7; }
-        .term-content p, .term-content ul { margin:0 0 1rem; }
-        .term-content ul { padding-left:1.25rem; }
-        .term-content li { margin:0.4rem 0; }
-        .actions { display:flex; gap:1rem; justify-content:flex-end; margin-top:2rem; }
-        .button { padding:0.85rem 1.4rem; border:none; border-radius:12px; font-weight:700; cursor:pointer; }
-        .btn-decline { background:#ef4444; color:#fff; }
-        .btn-accept { background:#2563eb; color:#fff; }
-        .back { display:inline-block; margin-top:1rem; color:#475569; text-decoration:none; }
+        /* Estilos específicos para o Termo A (Wall of text) */
+        .wall-of-text {
+            max-height: 50vh;
+            overflow-y: auto;
+            padding-right: 1rem;
+        }
+        
+        /* Semântica Cromática do Termo B */
+        .color-service { border-color: #3b82f6; background-color: #eff6ff; color: #1e40af; }
+        .color-attention { border-color: #f97316; background-color: #fff7ed; color: #9a3412; }
+        .color-security { border-color: #22c55e; background-color: #f0fdf4; color: #166534; }
+        .color-critical { border-color: #ef4444; background-color: #fef2f2; color: #991b1b; }
+        .icon-card { transition: all 0.3s ease; }
+        .icon-card:hover { transform: translateY(-2px); box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); }
+        .toggle-checkbox { width: 1.25rem; height: 1.25rem; cursor: pointer; border-radius: 0.25rem; }
     </style>
 </head>
-<body>
-<div class="page">
-    <section class="card">
-        <h1 id="term-title">Carregando termo...</h1>
+<body class="bg-slate-100 min-h-screen font-sans text-slate-800 flex items-center justify-center p-4 md:p-8">
+
+    <main class="w-full max-w-4xl bg-white rounded-3xl shadow-xl overflow-hidden border border-slate-200">
         
-        <div class="term-content" id="term-content">
+        <div class="p-6 md:p-8 border-b border-slate-100 flex justify-between items-start bg-slate-50/50">
+            <div>
+                <h1 id="term-title" class="text-2xl md:text-3xl font-black text-slate-900 tracking-tight">Carregando...</h1>
+                <p id="term-subtitle" class="text-sm text-indigo-600 font-medium mt-2 bg-indigo-50 inline-block px-3 py-1 rounded-full"></p>
+            </div>
+            <div class="text-right flex flex-col items-end">
+                <span class="bg-slate-200 text-slate-600 py-1 px-2 rounded text-[10px] font-bold uppercase tracking-widest" id="badge-version"></span>
+            </div>
+        </div>
+
+        <div class="p-6 md:p-8 bg-white w-full" id="term-content">
             </div>
 
-        <div class="actions">
-            <button type="button" class="button btn-decline" onclick="registerDecision(false)">Recusar</button>
-            <button type="button" class="button btn-accept" onclick="registerDecision(true)">Li e Aceito</button>
+        <div id="actions-container" class="p-6 md:p-8 bg-slate-50 border-t border-slate-100 flex flex-col sm:flex-row gap-4">
+            </div>
+        
+        <div class="px-8 pb-6 bg-slate-50 text-center">
+            <a href="index.html" class="text-slate-500 hover:text-indigo-600 text-sm font-medium transition-colors">← Voltar para seleção de modelo</a>
         </div>
-        <a class="back" href="index.html">Voltar para seleção de termo</a>
-    </section>
-</div>
 
-<script>
-    // Aqui você configura os textos dos seus Termos! (Pode colocar HTML, links, etc)
-    const termosDb = {
-        'A': {
-            title: 'Termos de Uso - Variante A (Padrão)',
-            content: '<p>Este é o texto do modelo de controle. Insira aqui o texto massivo, denso e tradicional de termos de uso.</p><ul><li>Regra 1</li><li>Regra 2</li></ul>'
-        },
-        'B': {
-            title: 'Termos de Uso - Variante B (Visual Law)',
-            content: '<p>Este é o texto do grupo experimental. Insira aqui suas imagens, ícones e explicações claras (o foco do seu TCC).</p><ul><li>Exemplo Visual 1</li><li>Exemplo Visual 2</li></ul>'
-        }
-    };
+    </main>
 
-    // Lê a URL (ex: termo.html?tipo=B) e preenche a tela
-    const urlParams = new URLSearchParams(window.location.search);
-    const tipo = urlParams.get('tipo') || 'A';
-    
-    document.getElementById('term-title').innerText = termosDb[tipo].title;
-    document.getElementById('term-content').innerHTML = termosDb[tipo].content;
-</script>
+    <script>
+        // =========================================================
+        // DADOS DO TERMO B (Seu protótipo Visual Law)
+        // =========================================================
+        const taxonomyRegistry = [
+            {
+                id: "essential_collect", label: "Coleta de Dados", description: "Dados cadastrais necessários para executar o serviço.",
+                icon: "user-search", colorClass: "color-service", type: "essential",
+                legal: { lgpd: ["Art.7, I"] }
+            },
+            {
+                id: "third_parties", label: "Terceiros", description: "Compartilhamento para fins de marketing parceiro.",
+                icon: "share-2", colorClass: "color-attention", type: "optional",
+                legal: { lgpd: ["Art.7, I", "Art.9"] }
+            },
+            {
+                id: "security", label: "Segurança", description: "Proteção contra fraudes e criptografia de ponta.",
+                icon: "shield-check", colorClass: "color-security", type: "info",
+                legal: { lgpd: ["Art.46"] }
+            },
+            {
+                id: "geolocation", label: "Localização", description: "Rastreamento GPS em tempo real para recursos extras.",
+                icon: "map-pin", colorClass: "color-attention", type: "optional",
+                legal: { lgpd: ["Art.7, I"] }
+            },
+            {
+                id: "erasure", label: "Rescisão", description: "Seu direito de solicitar exclusão definitiva dos dados.",
+                icon: "log-out", colorClass: "color-critical", type: "info",
+                legal: { lgpd: ["Art.18"] }
+            },
+            {
+                id: "ip_rights", label: "Propriedade", description: "Licença de uso sobre o conteúdo gerado por você.",
+                icon: "copyright", colorClass: "color-service", type: "optional",
+                legal: { lgpd: ["Art.7, I"] }
+            }
+        ];
 
-<script type="module" src="telemetry.js"></script>
+        // Gera as tags de cards para o Termo B
+        const cardsHTML = taxonomyRegistry.map(item => {
+            let controlUI = '';
+            if (item.type === 'essential') {
+                controlUI = `<span class="mt-3 inline-block text-[10px] font-bold uppercase tracking-wider bg-white/70 px-2 py-1 rounded shadow-sm opacity-90">Essencial (Sem Opt-out)</span>`;
+            } else if (item.type === 'info') {
+                controlUI = `<span class="mt-3 inline-block text-[10px] font-bold uppercase tracking-wider bg-white/70 px-2 py-1 rounded shadow-sm opacity-90">Informativo</span>`;
+            } else if (item.type === 'optional') {
+                controlUI = `
+                    <label class="mt-3 flex items-center gap-2 cursor-pointer font-bold text-[11px] uppercase tracking-wide bg-white/50 p-2 rounded hover:bg-white/80 transition-colors">
+                        <input type="checkbox" class="toggle-checkbox accent-current"> Permitir
+                    </label>`;
+            }
+
+            return `
+                <div class="icon-card p-5 border-2 rounded-2xl flex flex-col justify-between ${item.colorClass}">
+                    <div>
+                        <div class="flex items-center gap-3 mb-2">
+                            <div class="p-2 bg-white/80 rounded-lg shadow-sm"><i data-lucide="${item.icon}" class="w-6 h-6"></i></div>
+                            <span class="font-black text-sm uppercase tracking-tight">${item.label}</span>
+                        </div>
+                        <p class="text-xs mt-2 opacity-90 leading-relaxed font-medium">${item.description}</p>
+                        <div class="flex gap-1 mt-2 flex-wrap">
+                            ${item.legal.lgpd.map(art => `<span class="bg-white/40 px-1.5 py-0.5 rounded text-[8px] font-bold uppercase border border-white/20">LGPD ${art}</span>`).join('')}
+                        </div>
+                    </div>
+                    <div>${controlUI}</div>
+                </div>
+            `;
+        }).join('');
+
+        // =========================================================
+        // BANCO DE TERMOS (A = Tradicional / B = Visual Law)
+        // =========================================================
+        const termosDb = {
+            'A': {
+                title: 'Termos de Uso e Política de Privacidade',
+                subtitle: 'Contrato de Adesão Padrão',
+                badge: 'v1.0 Tradicional',
+                // TEXTO MASSIVO (Grupo de Controle)
+                content: `
+                    <div class="wall-of-text text-sm text-justify text-slate-600 space-y-4 pr-4">
+                        <p><strong>BEM-VINDO AOS TERMOS DE USO. LEIA ESTE DOCUMENTO COM ATENÇÃO.</strong></p>
+                        <p>1. DA ACEITAÇÃO: Ao marcar a caixa de seleção e clicar no botão "Aceito", o USUÁRIO declara ter lido, compreendido e aceitado todos os termos e condições aqui estabelecidos. O não aceite implica na impossibilidade categórica de uso dos serviços ofertados.</p>
+                        <p>2. DA COLETA DE DADOS: O PROVEDOR coletará, de forma irrestrita, dados pessoais do USUÁRIO, incluindo, mas não se limitando a: nome completo, endereço, CPF, RG, dados bancários, endereço de IP, geolocalização contínua, histórico de navegação, preferências de consumo, interações em redes sociais, metadados de comunicação, biometria facial e padrões de digitação.</p>
+                        <p>3. DO COMPARTILHAMENTO COM TERCEIROS: O USUÁRIO autoriza expressamente o compartilhamento, a título oneroso ou gratuito, de seus dados com empresas parceiras, subsidiárias, afiliadas, redes de publicidade, birôs de crédito e autoridades governamentais, para fins de marketing direcionado, análise de perfil (profiling), cruzamento de dados e quaisquer outras finalidades que o PROVEDOR julgar necessárias, inclusive com transferência internacional de dados para países sem legislação de proteção equivalente.</p>
+                        <p>4. DA PROPRIEDADE INTELECTUAL: Todo o conteúdo gerado, publicado, carregado ou transmitido pelo USUÁRIO através da plataforma torna-se, de forma irrevogável, irretratável, gratuita, global e perpétua, propriedade exclusiva do PROVEDOR, que poderá utilizá-lo, modificá-lo, sublicenciá-lo e comercializá-lo sem necessidade de aviso prévio ou compensação financeira.</p>
+                        <p>5. DA ISENÇÃO DE RESPONSABILIDADE: O PROVEDOR não se responsabiliza, sob nenhuma hipótese, por vazamentos de dados resultantes de ataques cibernéticos, falhas de sistema, interceptações ilegais ou culpa exclusiva de terceiros, cabendo ao USUÁRIO o risco integral e absoluto da utilização da plataforma e da submissão de suas informações.</p>
+                        <p>6. DAS ALTERAÇÕES DO TERMO: O PROVEDOR reserva-se o direito unilateral de alterar, modificar, adicionar ou remover partes destes termos a qualquer momento, sem notificação prévia. O uso contínuo da plataforma configurará aceite automático, incondicional e tácito das novas versões publicadas.</p>
+                        <p>7. DA RETENÇÃO DE DADOS: Os dados coletados serão armazenados por tempo indeterminado, mesmo após o encerramento da conta do USUÁRIO, para fins de auditoria, conformidade legal, treinamentos de algoritmos de inteligência artificial e análises preditivas próprias da empresa matriz.</p>
+                        <p>8. FORO: Elege-se o foro da comarca da sede do PROVEDOR, preterindo qualquer outro, para dirimir quaisquer dúvidas oriundas deste instrumento, com renúncia expressa do USUÁRIO a qualquer outro, por mais privilegiado que seja, arcando o USUÁRIO com todas as custas processuais caso ajuíze demanda perdedora.</p>
+                    </div>
+                    <div class="mt-6 border-t pt-5">
+                        <label class="flex items-start gap-3 cursor-pointer p-4 bg-slate-50 rounded-lg border border-slate-300 hover:bg-slate-100 transition-colors">
+                            <input type="checkbox" id="checkTermoA" class="w-5 h-5 mt-0.5 accent-indigo-600 rounded" onchange="toggleButtonA()">
+                            <span class="font-bold text-slate-700 text-sm leading-tight">Eu li e compreendi o texto longo acima e concordo integralmente com todas as disposições descritas de coleta, compartilhamento e uso de imagem.</span>
+                        </label>
+                    </div>
+                `,
+                actions: `
+                    <button type="button" onclick="registerDecision(false)" class="flex-1 px-6 py-4 border-2 border-slate-200 rounded-2xl text-slate-500 font-bold hover:bg-slate-100 transition-colors">Não Aceitar e Sair</button>
+                    <button type="button" id="btnAcceptA" onclick="registerDecision(true)" class="flex-[2] bg-indigo-600 text-white px-8 py-4 rounded-2xl font-black opacity-50 cursor-not-allowed transition-all text-center" disabled>Concordar e Enviar</button>
+                `
+            },
+            'B': {
+                title: 'Privacidade Transparente',
+                subtitle: 'Nós valorizamos sua privacidade. Ajuste abaixo o que faz sentido para você.',
+                badge: 'v2.1.0 Visual Law',
+                // CARDS COM ÍCONES (Grupo Experimental)
+                content: `
+                    <p class="text-slate-500 text-sm mb-6 font-medium">Controle como seus dados são utilizados. Finalidades essenciais já estão garantidas para a prestação do serviço principal.</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        ${cardsHTML}
+                    </div>
+                `,
+                actions: `
+                    <button type="button" onclick="registerDecision(false)" class="flex-1 px-6 py-4 border-2 border-slate-200 rounded-2xl text-slate-500 font-bold hover:bg-slate-100 hover:text-slate-800 transition-colors">Recusar Opcionais</button>
+                    <button type="button" onclick="registerDecision(true)" class="flex-[2] bg-indigo-600 text-white px-8 py-4 rounded-2xl font-black shadow-xl shadow-indigo-200 hover:bg-indigo-700 active:scale-95 transition-all text-center">Confirmar Preferências</button>
+                `
+            }
+        };
+
+        // Função para liberar o botão do Termo A apenas se marcar a caixa
+        window.toggleButtonA = function() {
+            const btn = document.getElementById('btnAcceptA');
+            const check = document.getElementById('checkTermoA');
+            if (check.checked) {
+                btn.disabled = false;
+                btn.classList.remove('opacity-50', 'cursor-not-allowed');
+                btn.classList.add('hover:bg-indigo-700', 'active:scale-95', 'shadow-xl', 'shadow-indigo-200');
+            } else {
+                btn.disabled = true;
+                btn.classList.add('opacity-50', 'cursor-not-allowed');
+                btn.classList.remove('hover:bg-indigo-700', 'active:scale-95', 'shadow-xl', 'shadow-indigo-200');
+            }
+        };
+
+        // Carrega a interface correta baseada na URL
+        document.addEventListener("DOMContentLoaded", () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const tipo = urlParams.get('tipo') || 'A';
+            
+            document.getElementById('term-title').innerText = termosDb[tipo].title;
+            document.getElementById('term-subtitle').innerText = termosDb[tipo].subtitle;
+            document.getElementById('badge-version').innerText = termosDb[tipo].badge;
+            document.getElementById('term-content').innerHTML = termosDb[tipo].content;
+            document.getElementById('actions-container').innerHTML = termosDb[tipo].actions;
+
+            // Instancia os ícones do Lucide no HTML injetado
+            lucide.createIcons();
+        });
+    </script>
+
+    <script type="module" src="telemetry.js"></script>
 </body>
 </html>
