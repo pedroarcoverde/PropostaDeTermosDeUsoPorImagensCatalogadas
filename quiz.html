@@ -19,47 +19,43 @@
     <div class="max-w-3xl w-full">
         <div class="mb-8 text-center">
             <h1 class="text-3xl font-black text-slate-900">Teste de Compreensão</h1>
-            <p class="text-slate-500 mt-2">Responda rapidamente as perguntas abaixo para testar o que você absorveu dos Termos de Uso.</p>
+            <p class="text-slate-500 mt-2">Responda às perguntas abaixo baseando-se nos Termos que você acabou de ler.</p>
         </div>
 
         <form id="quizForm">
             <div id="questionsContainer"></div>
-
-            <button type="submit" class="w-full bg-indigo-600 text-white font-black py-4 rounded-xl shadow-lg hover:bg-indigo-700 transition-all mt-6">
-                Finalizar e Ver Pontuação
+            <button id="submitBtn" type="submit" class="w-full bg-indigo-600 text-white font-black py-4 rounded-xl shadow-lg hover:bg-indigo-700 transition-all mt-6 flex justify-center items-center gap-2">
+                Finalizar e Registrar Respostas
             </button>
         </form>
 
         <div id="resultScreen" class="hidden text-center bg-white p-8 rounded-2xl shadow-xl border border-slate-200 mt-8">
-            <i data-lucide="award" class="w-16 h-16 text-indigo-500 mx-auto mb-4"></i>
-            <h2 class="text-2xl font-black text-slate-900">Pesquisa Concluída!</h2>
-            <p class="text-lg text-slate-600 mt-2">Sua pontuação de compreensão: <span id="scoreDisplay" class="font-black text-indigo-600 text-3xl"></span>/10</p>
-            <p id="groupDisplay" class="text-sm bg-slate-100 inline-block px-3 py-1 rounded-full text-slate-500 mt-4"></p>
+            <i data-lucide="check-circle" class="w-16 h-16 text-green-500 mx-auto mb-4"></i>
+            <h2 class="text-2xl font-black text-slate-900">Registro Concluído!</h2>
+            <p class="text-lg text-slate-600 mt-2">Sua pontuação de compreensão: <span id="scoreDisplay" class="font-black text-indigo-600 text-3xl"></span>/7</p>
+            <p class="text-sm text-slate-500 mt-4">Os dados do seu tempo de leitura e nota foram salvos para a pesquisa.</p>
             
             <div class="mt-8">
-                <a href="index.html" class="text-indigo-600 font-bold hover:underline">Voltar para a página inicial</a>
+                <a href="index.html" class="bg-slate-200 text-slate-700 px-6 py-3 rounded-lg font-bold hover:bg-slate-300 transition-colors">Voltar para o Início</a>
             </div>
         </div>
     </div>
 
-    <script>
+    <script type="module">
+        import { supabase } from './supabaseClient.js';
         lucide.createIcons();
         
-        // As 10 perguntas baseadas nos dados cedidos
+        // Perguntas Universais (Testam a eficácia da comunicação de ambos os modelos)
         const questions = [
-            { q: "1. O que acontece se você recusar a 'Coleta de Dados' essenciais?", options: ["O serviço funciona com limitações.", "É impossível usar o serviço principal.", "Apenas não receberei anúncios."], answer: 1 },
-            { q: "2. Com quem a empresa pode compartilhar seus dados (Terceiros)?", options: ["Com parceiros de marketing.", "Com a polícia apenas.", "Com absolutamente ninguém."], answer: 0 },
-            { q: "3. Você pode cancelar o uso do seu GPS (Geolocalização) depois?", options: ["Não, é permanente.", "Sim, é um dado opcional.", "Só pagando uma taxa."], answer: 1 },
-            { q: "4. Sobre a segurança dos seus dados, a empresa utiliza:", options: ["Nenhuma proteção tecnológica.", "Criptografia de ponta e sistemas antifraude.", "Apenas senhas simples."], answer: 1 },
-            { q: "5. Se você cansar do aplicativo, quais são seus direitos?", options: ["Pedir a exclusão e eliminação definitiva dos dados.", "Deixar a conta inativa, mas os dados ficam para sempre.", "Transferir a conta para outra pessoa apenas."], answer: 0 },
-            { q: "6. A coleta de conteúdo gerado por você (Propriedade) serve para:", options: ["Vender na dark web.", "Conceder licença de uso do seu conteúdo para o app.", "Imprimir em revistas da empresa."], answer: 1 },
-            { q: "7. A LGPD Art. 18 garante o que ao titular?", options: ["O direito à transparência e acesso aos dados.", "O pagamento de salário aos usuários.", "Acesso irrestrito ao banco de dados global."], answer: 0 },
-            { q: "8. Dados essenciais precisam de permissão do tipo 'Opt-in' (caixinha para marcar)?", options: ["Sim, tudo precisa.", "Não, finalidades essenciais estão embutidas no contrato.", "Apenas se o usuário for menor de idade."], answer: 1 },
-            { q: "9. O que ocorre no Termo A (texto longo) se a empresa for hackeada?", options: ["A empresa paga indenização.", "A empresa isenta-se de qualquer responsabilidade.", "O governo assume a culpa."], answer: 1 },
-            { q: "10. Você sentiu que entendeu melhor o destino dos seus dados com o modelo que utilizou?", options: ["Entendi perfeitamente.", "Entendi parcialmente.", "Não entendi nada."], answer: 0 } // Esta é subjetiva, mas para o quiz assumimos '0' como positiva.
+            { q: "1. O fornecimento de dados básicos de cadastro é obrigatório para usar o serviço?", options: ["Sim, não é possível usar sem eles.", "Não, o aplicativo funciona 100% anonimamente.", "Sim, mas eu sou pago por isso."], answer: 0 },
+            { q: "2. Com relação ao compartilhamento de dados com empresas terceiras, qual é a finalidade informada?", options: ["Para fins de investigações policiais.", "Para fins de marketing parceiro e publicidade.", "A empresa garante que nunca compartilha com terceiros."], answer: 1 },
+            { q: "3. O aplicativo realiza o rastreamento da sua localização física (GPS)?", options: ["Não, é proibido por lei.", "Sim, rastreia em tempo real para recursos extras.", "Apenas o CEP da residência."], answer: 1 },
+            { q: "4. Sobre a segurança das suas informações, o termo afirma que o aplicativo utiliza:", options: ["Criptografia de ponta e proteção contra fraudes.", "Apenas senhas básicas de 4 dígitos.", "Nenhuma medida tecnológica."], answer: 0 },
+            { q: "5. Se você decidir parar de usar o serviço, o que você tem o direito de solicitar?", options: ["A exclusão e eliminação definitiva dos seus dados.", "Que os dados fiquem congelados por 10 anos.", "Transferir a conta para outra pessoa."], answer: 0 },
+            { q: "6. Sobre o conteúdo (textos, fotos) que você gera na plataforma, de quem são os direitos de uso?", options: ["Ficam em domínio público.", "A empresa passa a ter licença e propriedade sobre eles.", "Pertencem ao governo federal."], answer: 1 },
+            { q: "7. A permissão para rastrear o seu GPS é classificada no termo como:", options: ["Um dado essencial (obrigatório).", "Uma permissão opcional (Opt-in).", "Um dado que não existe."], answer: 1 }
         ];
 
-        // Gera o HTML das perguntas
         const container = document.getElementById('questionsContainer');
         questions.forEach((qObj, index) => {
             let optionsHtml = '';
@@ -71,43 +67,59 @@
                     </label>
                 `;
             });
-
-            container.innerHTML += `
-                <div class="question-card">
-                    <p class="font-bold text-slate-800 mb-3">${qObj.q}</p>
-                    <div class="flex flex-col gap-2">
-                        ${optionsHtml}
-                    </div>
-                </div>
-            `;
+            container.innerHTML += `<div class="question-card"><p class="font-bold text-slate-800 mb-3">${qObj.q}</p><div class="flex flex-col gap-2">${optionsHtml}</div></div>`;
         });
 
-        // Trata o envio do formulário
-        document.getElementById('quizForm').addEventListener('submit', function(e) {
+        document.getElementById('quizForm').addEventListener('submit', async function(e) {
             e.preventDefault();
-            let score = 0;
+            
+            // Troca o botão para carregando
+            const btn = document.getElementById('submitBtn');
+            btn.innerHTML = 'Salvando dados no Supabase...';
+            btn.disabled = true;
 
-            // Calcula a pontuação
+            let score = 0;
             questions.forEach((qObj, index) => {
                 const selected = document.querySelector(`input[name="q${index}"]:checked`);
-                if (selected && parseInt(selected.value) === qObj.answer) {
-                    score++;
-                }
+                if (selected && parseInt(selected.value) === qObj.answer) score++;
             });
 
-            // Recupera qual termo o usuário leu pela URL
-            const urlParams = new URLSearchParams(window.location.search);
-            const grupoLido = urlParams.get('tipo') || 'Desconhecido';
+            // Resgata o tempo de leitura e a resposta lá do termo.html
+            const tempConsent = JSON.parse(sessionStorage.getItem('temp_consent'));
 
-            // Oculta o form e mostra o resultado
-            document.getElementById('quizForm').classList.add('hidden');
-            document.getElementById('resultScreen').classList.remove('hidden');
-            
-            document.getElementById('scoreDisplay').innerText = score;
-            document.getElementById('groupDisplay').innerText = `Você leu o Termo Variante: ${grupoLido}`;
+            if (!tempConsent) {
+                alert('Erro: Dados da sessão não encontrados. Volte à tela inicial.');
+                return;
+            }
 
-            // OPCIONAL PARA O TCC: Você pode enviar a nota 'score' aqui pro seu Supabase!
-            console.log(`Grupo: ${grupoLido} | Acertos: ${score}/10`);
+            try {
+                // Envia tudo consolidado para o banco
+                const { error } = await supabase
+                    .from('ConsentRecords')
+                    .insert([{
+                        user_id: tempConsent.user_id,
+                        experimental_group: tempConsent.experimental_group,
+                        has_accepted: tempConsent.has_accepted,
+                        latency_milliseconds: tempConsent.latency_milliseconds,
+                        quiz_score: score // A nova coluna!
+                    }]);
+
+                if (error) throw error;
+
+                // Mostra o resultado
+                document.getElementById('quizForm').classList.add('hidden');
+                document.getElementById('resultScreen').classList.remove('hidden');
+                document.getElementById('scoreDisplay').innerText = score;
+                
+                // Limpa o cache para o próximo teste
+                sessionStorage.removeItem('temp_consent');
+
+            } catch (err) {
+                console.error(err);
+                alert('Falha ao salvar no banco. Verifique o console.');
+                btn.innerHTML = 'Tentar Novamente';
+                btn.disabled = false;
+            }
         });
     </script>
 </body>
