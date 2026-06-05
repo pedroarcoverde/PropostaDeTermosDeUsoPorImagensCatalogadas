@@ -32,6 +32,7 @@
                     <th>Tipo de termo</th>
                     <th>Resposta</th>
                     <th>Tempo (ms)</th>
+                    <th>Nota do Quiz</th>
                     <th>Data/Hora</th>
                 </tr>
             </thead>
@@ -87,6 +88,7 @@
                         </span>
                     </td>
                     <td>${item.latency_milliseconds}</td>
+                    <td><b>${item.quiz_score !== null ? item.quiz_score + '/7' : '-'}</b></td>
                     <td>${date}</td>
                 `;
                 tbody.appendChild(tr);
