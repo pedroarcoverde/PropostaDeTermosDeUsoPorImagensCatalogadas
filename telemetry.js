@@ -35,7 +35,7 @@ window.registerDecision = async function(accepted) {
         if (error) throw error;
 
         alert(`Decisão registrada com sucesso no Supabase!\nTempo de processamento: ${timeSpentMs} ms`);
-        window.location.href = 'index.html';
+        window.location.href = `quiz.html?tipo=${currentGroup}&uid=${userId}`;
         
     } catch (error) {
         console.error('Erro ao salvar no Supabase:', error);

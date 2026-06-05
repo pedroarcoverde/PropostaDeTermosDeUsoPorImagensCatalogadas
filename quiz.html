@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pesquisa de Compreensão</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body { background: #f8fafc; font-family: 'Segoe UI', sans-serif; }
+        .question-card { background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 1.5rem; margin-bottom: 1rem; }
+        .option-label { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem; border: 1px solid #cbd5e1; border-radius: 8px; cursor: pointer; transition: all 0.2s; }
+        .option-label:hover { background: #f1f5f9; }
+        input[type="radio"]:checked + span { font-weight: bold; color: #4f46e5; }
+    </style>
+</head>
+<body class="p-4 md:p-8 flex justify-center">
+
+    <div class="max-w-3xl w-full">
+        <div class="mb-8 text-center">
+            <h1 class="text-3xl font-black text-slate-900">Teste de Compreensão</h1>
+            <p class="text-slate-500 mt-2">Responda rapidamente as perguntas abaixo para testar o que você absorveu dos Termos de Uso.</p>
+        </div>
+
+        <form id="quizForm">
+            <div id="questionsContainer"></div>
+
+            <button type="submit" class="w-full bg-indigo-600 text-white font-black py-4 rounded-xl shadow-lg hover:bg-indigo-700 transition-all mt-6">
+                Finalizar e Ver Pontuação
+            </button>
+        </form>
+
+        <div id="resultScreen" class="hidden text-center bg-white p-8 rounded-2xl shadow-xl border border-slate-200 mt-8">
+            <i data-lucide="award" class="w-16 h-16 text-indigo-500 mx-auto mb-4"></i>
+            <h2 class="text-2xl font-black text-slate-900">Pesquisa Concluída!</h2>
+            <p class="text-lg text-slate-600 mt-2">Sua pontuação de compreensão: <span id="scoreDisplay" class="font-black text-indigo-600 text-3xl"></span>/10</p>
+            <p id="groupDisplay" class="text-sm bg-slate-100 inline-block px-3 py-1 rounded-full text-slate-500 mt-4"></p>
+            
+            <div class="mt-8">
+                <a href="index.html" class="text-indigo-600 font-bold hover:underline">Voltar para a página inicial</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+        
+        // As 10 perguntas baseadas nos dados cedidos
+        const questions = [
+            { q: "1. O que acontece se você recusar a 'Coleta de Dados' essenciais?", options: ["O serviço funciona com limitações.", "É impossível usar o serviço principal.", "Apenas não receberei anúncios."], answer: 1 },
+            { q: "2. Com quem a empresa pode compartilhar seus dados (Terceiros)?", options: ["Com parceiros de marketing.", "Com a polícia apenas.", "Com absolutamente ninguém."], answer: 0 },
+            { q: "3. Você pode cancelar o uso do seu GPS (Geolocalização) depois?", options: ["Não, é permanente.", "Sim, é um dado opcional.", "Só pagando uma taxa."], answer: 1 },
+            { q: "4. Sobre a segurança dos seus dados, a empresa utiliza:", options: ["Nenhuma proteção tecnológica.", "Criptografia de ponta e sistemas antifraude.", "Apenas senhas simples."], answer: 1 },
+            { q: "5. Se você cansar do aplicativo, quais são seus direitos?", options: ["Pedir a exclusão e eliminação definitiva dos dados.", "Deixar a conta inativa, mas os dados ficam para sempre.", "Transferir a conta para outra pessoa apenas."], answer: 0 },
+            { q: "6. A coleta de conteúdo gerado por você (Propriedade) serve para:", options: ["Vender na dark web.", "Conceder licença de uso do seu conteúdo para o app.", "Imprimir em revistas da empresa."], answer: 1 },
+            { q: "7. A LGPD Art. 18 garante o que ao titular?", options: ["O direito à transparência e acesso aos dados.", "O pagamento de salário aos usuários.", "Acesso irrestrito ao banco de dados global."], answer: 0 },
+            { q: "8. Dados essenciais precisam de permissão do tipo 'Opt-in' (caixinha para marcar)?", options: ["Sim, tudo precisa.", "Não, finalidades essenciais estão embutidas no contrato.", "Apenas se o usuário for menor de idade."], answer: 1 },
+            { q: "9. O que ocorre no Termo A (texto longo) se a empresa for hackeada?", options: ["A empresa paga indenização.", "A empresa isenta-se de qualquer responsabilidade.", "O governo assume a culpa."], answer: 1 },
+            { q: "10. Você sentiu que entendeu melhor o destino dos seus dados com o modelo que utilizou?", options: ["Entendi perfeitamente.", "Entendi parcialmente.", "Não entendi nada."], answer: 0 } // Esta é subjetiva, mas para o quiz assumimos '0' como positiva.
+        ];
+
+        // Gera o HTML das perguntas
+        const container = document.getElementById('questionsContainer');
+        questions.forEach((qObj, index) => {
+            let optionsHtml = '';
+            qObj.options.forEach((opt, optIdx) => {
+                optionsHtml += `
+                    <label class="option-label">
+                        <input type="radio" name="q${index}" value="${optIdx}" class="accent-indigo-600" required>
+                        <span>${opt}</span>
+                    </label>
+                `;
+            });
+
+            container.innerHTML += `
+                <div class="question-card">
+                    <p class="font-bold text-slate-800 mb-3">${qObj.q}</p>
+                    <div class="flex flex-col gap-2">
+                        ${optionsHtml}
+                    </div>
+                </div>
+            `;
+        });
+
+        // Trata o envio do formulário
+        document.getElementById('quizForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            let score = 0;
+
+            // Calcula a pontuação
+            questions.forEach((qObj, index) => {
+                const selected = document.querySelector(`input[name="q${index}"]:checked`);
+                if (selected && parseInt(selected.value) === qObj.answer) {
+                    score++;
+                }
+            });
+
+            // Recupera qual termo o usuário leu pela URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const grupoLido = urlParams.get('tipo') || 'Desconhecido';
+
+            // Oculta o form e mostra o resultado
+            document.getElementById('quizForm').classList.add('hidden');
+            document.getElementById('resultScreen').classList.remove('hidden');
+            
+            document.getElementById('scoreDisplay').innerText = score;
+            document.getElementById('groupDisplay').innerText = `Você leu o Termo Variante: ${grupoLido}`;
+
+            // OPCIONAL PARA O TCC: Você pode enviar a nota 'score' aqui pro seu Supabase!
+            console.log(`Grupo: ${grupoLido} | Acertos: ${score}/10`);
+        });
+    </script>
+</body>
+</html>
