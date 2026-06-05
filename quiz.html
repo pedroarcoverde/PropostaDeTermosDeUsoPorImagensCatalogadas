@@ -73,10 +73,14 @@
         document.getElementById('quizForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
-            // Troca o botão para carregando
+            // 1. Desabilita todos os inputs imediatamente
+            const inputs = document.querySelectorAll('input[type="radio"]');
+            inputs.forEach(input => input.disabled = true);
+            
+            // 2. Esconde o botão de envio
             const btn = document.getElementById('submitBtn');
-            btn.innerHTML = 'Salvando dados no Supabase...';
-            btn.disabled = true;
+            btn.style.display = 'none';
+            btn.innerHTML = 'Salvando...';
 
             let score = 0;
             questions.forEach((qObj, index) => {
@@ -84,16 +88,13 @@
                 if (selected && parseInt(selected.value) === qObj.answer) score++;
             });
 
-            // Resgata o tempo de leitura e a resposta lá do termo.html
             const tempConsent = JSON.parse(sessionStorage.getItem('temp_consent'));
-
             if (!tempConsent) {
-                alert('Erro: Dados da sessão não encontrados. Volte à tela inicial.');
+                alert('Erro: Sessão expirada.');
                 return;
             }
 
             try {
-                // Envia tudo consolidado para o banco
                 const { error } = await supabase
                     .from('ConsentRecords')
                     .insert([{
@@ -101,23 +102,28 @@
                         experimental_group: tempConsent.experimental_group,
                         has_accepted: tempConsent.has_accepted,
                         latency_milliseconds: tempConsent.latency_milliseconds,
-                        quiz_score: score // A nova coluna!
+                        quiz_score: score
                     }]);
 
                 if (error) throw error;
+
+                // 3. Trava o fluxo: Adiciona estado ao histórico para impedir o "Voltar"
+                history.pushState(null, null, location.href);
+                window.onpopstate = function () {
+                    history.go(1);
+                };
 
                 // Mostra o resultado
                 document.getElementById('quizForm').classList.add('hidden');
                 document.getElementById('resultScreen').classList.remove('hidden');
                 document.getElementById('scoreDisplay').innerText = score;
                 
-                // Limpa o cache para o próximo teste
                 sessionStorage.removeItem('temp_consent');
 
             } catch (err) {
                 console.error(err);
-                alert('Falha ao salvar no banco. Verifique o console.');
-                btn.innerHTML = 'Tentar Novamente';
+                alert('Falha ao salvar. Tente novamente.');
+                btn.style.display = 'flex';
                 btn.disabled = false;
             }
         });
