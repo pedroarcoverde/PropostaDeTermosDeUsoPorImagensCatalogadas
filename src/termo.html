@@ -1,13 +1,9 @@
-@model ConsentTelemetry.Models.TermosDeUsoViewModel
-@{
-    Layout = null;
-}
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@Model.Title</title>
+    <title>Termos de Uso</title>
     <style>
         body { margin:0; font-family:'Segoe UI',sans-serif; background:#f8fafc; color:#0f172a; }
         .page { display:flex; min-height:100vh; align-items:center; justify-content:center; padding:2rem; }
@@ -27,20 +23,40 @@
 <body>
 <div class="page">
     <section class="card">
-        <h1>@Model.Title</h1>
-        <div class="term-content">
-            @Html.Raw(Model.ContentHtml)
-        </div>
+        <h1 id="term-title">Carregando termo...</h1>
+        
+        <div class="term-content" id="term-content">
+            </div>
+
         <div class="actions">
             <button type="button" class="button btn-decline" onclick="registerDecision(false)">Recusar</button>
             <button type="button" class="button btn-accept" onclick="registerDecision(true)">Li e Aceito</button>
         </div>
-        <a class="back" href="@Url.Action("Index", "Home")">Voltar para seleção de termo</a>
+        <a class="back" href="index.html">Voltar para seleção de termo</a>
     </section>
 </div>
+
 <script>
-    window.termVariant = "@Model.Variant";
+    // Aqui você configura os textos dos seus Termos! (Pode colocar HTML, links, etc)
+    const termosDb = {
+        'A': {
+            title: 'Termos de Uso - Variante A (Padrão)',
+            content: '<p>Este é o texto do modelo de controle. Insira aqui o texto massivo, denso e tradicional de termos de uso.</p><ul><li>Regra 1</li><li>Regra 2</li></ul>'
+        },
+        'B': {
+            title: 'Termos de Uso - Variante B (Visual Law)',
+            content: '<p>Este é o texto do grupo experimental. Insira aqui suas imagens, ícones e explicações claras (o foco do seu TCC).</p><ul><li>Exemplo Visual 1</li><li>Exemplo Visual 2</li></ul>'
+        }
+    };
+
+    // Lê a URL (ex: termo.html?tipo=B) e preenche a tela
+    const urlParams = new URLSearchParams(window.location.search);
+    const tipo = urlParams.get('tipo') || 'A';
+    
+    document.getElementById('term-title').innerText = termosDb[tipo].title;
+    document.getElementById('term-content').innerHTML = termosDb[tipo].content;
 </script>
-<script src="/js/telemetry.js"></script>
+
+<script type="module" src="telemetry.js"></script>
 </body>
 </html>

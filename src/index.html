@@ -1,12 +1,9 @@
-@{
-    Layout = null;
-}
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SeleÁ„o de Termos de Uso</title>
+    <title>Sele√ß√£o de Termos de Uso</title>
     <style>
         body { margin: 0; font-family: 'Segoe UI', sans-serif; background:#f0f4f8; color:#0f172a; }
         .page { display:flex; min-height:100vh; align-items:center; justify-content:center; padding:2rem; }
@@ -28,17 +25,17 @@
         <h1>Escolha o termo de uso</h1>
         <p>Selecione a variante A ou B para exibir o termo de compromisso correspondente.</p>
         <div class="choices">
-            <a class="choice" href="@Url.Action("TermosDeUso", "Home", new { tipo = "A" })">
+            <a class="choice" href="termo.html?tipo=A">
                 Termo A
-                <span>Vers„o padr„o com linguagem direta e foco em clareza.</span>
+                <span>Vers√£o padr√£o com linguagem direta e foco em clareza.</span>
             </a>
-            <a class="choice" href="@Url.Action("TermosDeUso", "Home", new { tipo = "B" })">
+            <a class="choice" href="termo.html?tipo=B">
                 Termo B
-                <span>Vers„o alternativa com foco em contexto visual e transparÍncia.</span>
+                <span>Vers√£o alternativa com foco em contexto visual e transpar√™ncia.</span>
             </a>
         </div>
         <div class="controls">
-            <a class="button secondary" href="@Url.Action("Logs", "Home")">Ver logs registrados</a>
+            <a class="button secondary" href="logs.html">Ver logs registrados</a>
         </div>
     </section>
 </div>
