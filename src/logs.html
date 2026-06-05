@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logs de Consentimento</title>
+    <style>
+        body { margin:0; font-family:'Segoe UI',sans-serif; background:#eef2ff; color:#111827; }
+        .page { padding:2rem; }
+        .panel { background:#fff; border-radius:18px; padding:2rem; box-shadow:0 20px 60px rgba(15,23,42,.08); }
+        h1 { margin-top:0; }
+        table { width:100%; border-collapse:collapse; margin-top:1.5rem; }
+        th, td { padding:0.9rem 0.8rem; text-align:left; border-bottom:1px solid #e2e8f0; }
+        th { background:#f8fafc; color:#0f172a; }
+        tbody tr:hover { background:#f8fafc; }
+        .empty { color:#475569; }
+        .actions { margin-top:1.5rem; display:flex; justify-content:flex-end; }
+        .button { padding:0.85rem 1.2rem; border:none; border-radius:12px; background:#2563eb; color:#fff; text-decoration:none; font-weight:700; }
+    </style>
+</head>
+<body>
+<div class="page">
+    <section class="panel">
+        <h1>Logs de Consentimento</h1>
+        
+        <div id="loading" style="margin-bottom: 1rem; color: #475569;">Carregando logs do Supabase...</div>
+        
+        <table id="logsTable" style="display: none;">
+            <thead>
+                <tr>
+                    <th>User ID (UUID)</th>
+                    <th>Tipo de termo</th>
+                    <th>Resposta</th>
+                    <th>Tempo (ms)</th>
+                    <th>Data/Hora</th>
+                </tr>
+            </thead>
+            <tbody id="logsBody">
+                </tbody>
+        </table>
+        
+        <p id="emptyMessage" class="empty" style="display: none;">Nenhum log registrado ainda.</p>
+        
+        <div class="actions">
+            <a class="button" href="index.html">Voltar para Início</a>
+        </div>
+    </section>
+</div>
+
+<script type="module">
+    import { supabase } from './supabaseClient.js';
+
+    async function loadLogs() {
+        try {
+            // Consulta o banco ordenando do mais recente para o mais antigo
+            const { data, error } = await supabase
+                .from('ConsentRecords')
+                .select('*')
+                .order('created_at', { ascending: false });
+
+            if (error) throw error;
+
+            document.getElementById('loading').style.display = 'none';
+
+            if (!data || data.length === 0) {
+                document.getElementById('emptyMessage').style.display = 'block';
+                return;
+            }
+
+            document.getElementById('logsTable').style.display = 'table';
+            const tbody = document.getElementById('logsBody');
+
+            // Percorre cada registro do banco e cria uma linha na tabela
+            data.forEach(item => {
+                const tr = document.createElement('tr');
+                
+                // Formata a data do banco para o horário local do Brasil
+                const date = new Date(item.created_at).toLocaleString('pt-BR');
+                
+                // Exibe só o começo do ID para não quebrar o layout, mas deixa ele todo no title do mouse
+                tr.innerHTML = `
+                    <td title="${item.user_id}">${item.user_id.split('-')[0]}...</td>
+                    <td><b>${item.experimental_group}</b></td>
+                    <td>
+                        <span style="color: ${item.has_accepted ? '#16a34a' : '#dc2626'}">
+                            ${item.has_accepted ? "Aceito" : "Rejeitado"}
+                        </span>
+                    </td>
+                    <td>${item.latency_milliseconds}</td>
+                    <td>${date}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+        } catch (err) {
+            console.error("Erro ao buscar logs:", err);
+            document.getElementById('loading').innerText = "Erro ao carregar logs. Verifique o console de desenvolvedor (F12).";
+        }
+    }
+
+    // Chama a função assim que a página abre
+    loadLogs();
+</script>
+</body>
+</html>
