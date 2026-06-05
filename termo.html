@@ -88,6 +88,40 @@
         ];
 
         // Gera as tags de cards para o Termo B
+        // Dicionário de Leis da LGPD
+        const lgpdDb = {
+            "Art.7, I": { title: "Artigo 7º, Inciso I", desc: "Permite o uso dos seus dados apenas quando você fornece o consentimento explícito e claro para aquela finalidade." },
+            "Art.7, II": { title: "Artigo 7º, Inciso II", desc: "Permite o uso dos dados quando for estritamente necessário para cumprir um contrato (o serviço principal)." },
+            "Art.9": { title: "Artigo 9º", desc: "Garante a você o direito à informação transparente, clara e acessível sobre como seus dados são tratados." },
+            "Art.18": { title: "Artigo 18º", desc: "Garante os seus direitos como titular: você pode pedir acesso, correção, bloqueio ou eliminação definitiva dos seus dados." },
+            "Art.46": { title: "Artigo 46º", desc: "Obriga a empresa a usar medidas de segurança técnicas (como criptografia) para proteger seus dados contra vazamentos." }
+        };
+
+        // Funções para mostrar e esconder a modal da LGPD
+        window.showLgpdModal = function(art) {
+            const modal = document.getElementById('lgpd-modal');
+            document.getElementById('lgpd-title').innerText = lgpdDb[art]?.title || art;
+            document.getElementById('lgpd-desc').innerText = lgpdDb[art]?.desc || "Descrição legal.";
+            modal.classList.remove('hidden');
+            setTimeout(() => modal.classList.remove('opacity-0'), 10);
+        };
+
+        window.hideLgpdModal = function() {
+            const modal = document.getElementById('lgpd-modal');
+            modal.classList.add('opacity-0');
+            setTimeout(() => modal.classList.add('hidden'), 200);
+        };
+
+        // Faz a modal seguir o mouse
+        document.addEventListener('mousemove', (e) => {
+            const modal = document.getElementById('lgpd-modal');
+            if (!modal.classList.contains('hidden')) {
+                modal.style.left = (e.clientX + 15) + 'px';
+                modal.style.top = (e.clientY + 15) + 'px';
+            }
+        });
+
+        // Gera as tags de cards para o Termo B (Agora com os eventos de Mouse)
         const cardsHTML = taxonomyRegistry.map(item => {
             let controlUI = '';
             if (item.type === 'essential') {
@@ -110,7 +144,12 @@
                         </div>
                         <p class="text-xs mt-2 opacity-90 leading-relaxed font-medium">${item.description}</p>
                         <div class="flex gap-1 mt-2 flex-wrap">
-                            ${item.legal.lgpd.map(art => `<span class="bg-white/40 px-1.5 py-0.5 rounded text-[8px] font-bold uppercase border border-white/20">LGPD ${art}</span>`).join('')}
+                            ${item.legal.lgpd.map(art => `
+                                <span class="group relative bg-white/40 px-1.5 py-0.5 rounded text-[8px] font-bold uppercase border border-white/20 cursor-help"
+                                    onmouseenter="showLgpdModal('${art}')" onmouseleave="hideLgpdModal()">
+                                    LGPD ${art}
+                                </span>
+                            `).join('')}
                         </div>
                     </div>
                     <div>${controlUI}</div>
@@ -202,4 +241,11 @@
 
     <script type="module" src="telemetry.js"></script>
 </body>
+<div id="lgpd-modal" class="fixed hidden z-50 bg-slate-900 text-white p-5 rounded-2xl shadow-2xl max-w-xs pointer-events-none transition-opacity duration-200 opacity-0">
+    <div class="flex items-center gap-2 mb-2">
+        <i data-lucide="scale" class="w-5 h-5 text-indigo-400"></i>
+        <h3 id="lgpd-title" class="text-lg font-black text-indigo-400"></h3>
+    </div>
+    <p id="lgpd-desc" class="text-sm leading-relaxed text-slate-300"></p>
+</div>
 </html>
