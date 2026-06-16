@@ -36,47 +36,33 @@
             <p class="text-sm text-slate-500 mt-4">Os dados do seu tempo de leitura e nota foram salvos para a pesquisa.</p>
             
             <div id="feedbackSectionA" class="hidden mt-10 text-left bg-indigo-50 p-6 rounded-2xl border border-indigo-100">
+    
                 <div class="mb-8">
-                    <h3 class="text-2xl font-black text-indigo-900 mb-2">Entendendo a sua experiência</h3>
-                    <p class="text-sm text-indigo-700 leading-relaxed">
-                        Você leu o <b>Termo Padrão</b>, caracterizado por blocos densos de texto. O nosso projeto estuda como o <b>Visual Law</b> pode mitigar o desgaste da leitura desses documentos.
+                    <h3 class="text-2xl font-black text-indigo-900 mb-2">Por que a transparência importa?</h3>
+                    <p class="text-sm text-indigo-700 leading-relaxed mb-4">
+                        Você leu o <b>Termo de Uso Tradicional</b>. Agora, compare-o com a nossa proposta de <b>Visual Law</b> abaixo.
                     </p>
+
+                    <div class="grid md:grid-cols-2 gap-4 mb-6">
+                        <div class="bg-white p-4 rounded-xl border border-indigo-100">
+                            <h4 class="font-bold text-indigo-800 text-sm mb-1">O que é Opcional (Opt-in)?</h4>
+                            <p class="text-[12px] text-slate-600">São escolhas que respeitam sua autonomia. Você decide o que compartilhar com terceiros ou se deseja ativar recursos como GPS.</p>
+                        </div>
+                        <div class="bg-white p-4 rounded-xl border border-indigo-100">
+                            <h4 class="font-bold text-indigo-800 text-sm mb-1">Por que há itens obrigatórios?</h4>
+                            <p class="text-[12px] text-slate-600">Dados essenciais são a base do serviço. Sem eles, o contrato não se sustenta tecnicamente. O Visual Law os destaca para evitar confusão.</p>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="grid md:grid-cols-2 gap-4 mb-6">
-                    <div class="bg-white p-4 rounded-xl border border-indigo-100 shadow-sm">
-                        <h4 class="font-bold text-indigo-800 text-sm mb-1">1. Por que alguns termos são "Opcionais"?</h4>
-                        <p class="text-[12px] text-slate-600">Isso é <b>Opt-in</b>. Privacidade não é tudo ou nada. Termos opcionais permitem que você controle apenas o que faz sentido para você, devolvendo a autonomia sobre seus dados.</p>
-                    </div>
-                    <div class="bg-white p-4 rounded-xl border border-indigo-100 shadow-sm">
-                        <h4 class="font-bold text-indigo-800 text-sm mb-1">2. Por que alguns são obrigatórios?</h4>
-                        <p class="text-[12px] text-slate-600">São dados <b>Essenciais</b>. Sem eles, o serviço técnico não funciona. Não é para rastrear você, mas para garantir que o sistema entregue o valor prometido.</p>
-                    </div>
-                </div>
-
-                <div class="bg-indigo-100 p-4 rounded-xl mb-6">
-                    <p class="text-xs text-indigo-900 font-medium">
-                        <b>O ganho de compreensão:</b> Ao usar ícones e cores semânticas, reduzimos sua <em>carga cognitiva</em>. O cérebro processa imagens mais rápido que textos longos. Veja como o modelo de <b>Visual Law</b> organiza a mesma informação que você acabou de ler:
-                    </p>
-                </div>
-
-                <div class="bg-white p-4 rounded-xl border border-indigo-200 mb-5 flex flex-wrap gap-4 justify-center pointer-events-none">
-                    <div class="w-24 p-2 border-2 border-blue-500 bg-blue-50 rounded-lg text-center">
-                        <i data-lucide="user-search" class="w-5 h-5 text-blue-700 mx-auto mb-1"></i>
-                        <span class="text-[9px] font-bold text-blue-800 uppercase tracking-tight block">Coleta</span>
-                    </div>
-                    <div class="w-24 p-2 border-2 border-orange-500 bg-orange-50 rounded-lg text-center">
-                        <i data-lucide="share-2" class="w-5 h-5 text-orange-700 mx-auto mb-1"></i>
-                        <span class="text-[9px] font-bold text-orange-800 uppercase tracking-tight block">Terceiros</span>
-                    </div>
-                    <div class="w-24 p-2 border-2 border-green-500 bg-green-50 rounded-lg text-center">
-                        <i data-lucide="shield-check" class="w-5 h-5 text-green-700 mx-auto mb-1"></i>
-                        <span class="text-[9px] font-bold text-green-800 uppercase tracking-tight block">Segurança</span>
-                    </div>
+                <div id="fullTermBContainer" class="bg-white p-6 rounded-2xl border border-indigo-200 shadow-sm mb-8 pointer-events-none">
+                    <h4 class="font-black text-slate-800 mb-4 uppercase tracking-widest text-sm border-b pb-2">Privacidade Transparente (Visual Law)</h4>
+                    <div id="termBCardsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        </div>
                 </div>
 
                 <label for="feedbackTextA" class="block text-sm font-bold text-indigo-900 mb-2">
-                    Essa alternativa visual ajudaria você a tomar decisões de privacidade mais conscientes?
+                    A clareza do modelo visual acima facilitaria sua tomada de decisão?
                 </label>
                 <textarea id="feedbackTextA" class="w-full p-3 border border-indigo-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none resize-none" rows="3" placeholder="Sua opinião é fundamental para o TCC..."></textarea>
                 
@@ -128,6 +114,35 @@
             { q: "6. Sobre o conteúdo (textos, fotos) que você gera na plataforma, de quem são os direitos de uso?", options: ["Ficam em domínio público.", "A empresa passa a ter licença e propriedade sobre eles.", "Pertencem ao governo federal."], answer: 1 },
             { q: "7. A permissão para rastrear o seu GPS é classificada no termo como:", options: ["Um dado essencial (obrigatório).", "Uma permissão opcional (Opt-in).", "Um dado que não existe."], answer: 1 }
         ];
+
+        // Dados necessários para renderizar o Termo B (Taxonomia)
+        const taxonomyRegistry = [
+            { id: "essential_collect", label: "Coleta de Dados", description: "Dados cadastrais necessários para executar o serviço.", icon: "user-search", colorClass: "color-service", type: "essential" },
+            { id: "third_parties", label: "Terceiros", description: "Compartilhamento para fins de marketing parceiro.", icon: "share-2", colorClass: "color-attention", type: "optional" },
+            { id: "security", label: "Segurança", description: "Proteção contra fraudes e criptografia de ponta.", icon: "shield-check", colorClass: "color-security", type: "info" },
+            { id: "geolocation", label: "Localização", description: "Rastreamento GPS em tempo real para recursos extras.", icon: "map-pin", colorClass: "color-attention", type: "optional" },
+            { id: "erasure", label: "Rescisão", description: "Seu direito de solicitar exclusão definitiva dos dados.", icon: "log-out", colorClass: "color-critical", type: "info" },
+            { id: "ip_rights", label: "Propriedade", description: "Licença de uso sobre o conteúdo gerado por você.", icon: "copyright", colorClass: "color-service", type: "optional" }
+        ];
+
+        // Função que renderiza o Termo B dentro do quiz
+        function renderTermBPreview() {
+            const grid = document.getElementById('termBCardsGrid');
+            grid.innerHTML = taxonomyRegistry.map(item => `
+                <div class="p-4 border-2 rounded-xl flex flex-col justify-between ${item.colorClass.replace('color-', 'bg-').replace('color-', 'border-')} border-blue-200">
+                    <div class="flex items-center gap-2 mb-2">
+                        <i data-lucide="${item.icon}" class="w-5 h-5"></i>
+                        <span class="font-black text-xs uppercase">${item.label}</span>
+                    </div>
+                    <p class="text-[10px] leading-relaxed mb-3 opacity-80">${item.description}</p>
+                    <span class="text-[9px] font-bold uppercase bg-white/50 px-2 py-1 rounded w-fit">
+                        ${item.type === 'essential' ? 'Obrigatório' : item.type === 'optional' ? 'Opt-in' : 'Informativo'}
+                    </span>
+                </div>
+            `).join('');
+            
+            // Aplicar estilos de cor manualmente 
+        }
 
         const container = document.getElementById('questionsContainer');
         questions.forEach((qObj, index) => {
@@ -190,6 +205,7 @@
                 // Exibe a seção de feedback correta baseada no grupo
                 if (tempConsent.experimental_group === 'A') {
                     document.getElementById('feedbackSectionA').classList.remove('hidden');
+                    renderTermBPreview(); // Renderiza o preview do Termo B para o grupo A
                 } else {
                     document.getElementById('feedbackSectionB').classList.remove('hidden');
                 }
