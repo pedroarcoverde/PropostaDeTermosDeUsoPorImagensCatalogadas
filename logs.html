@@ -6,14 +6,15 @@
     <title>Logs de Consentimento</title>
     <style>
         body { margin:0; font-family:'Segoe UI',sans-serif; background:#eef2ff; color:#111827; }
-        .page { padding:2rem; }
-        .panel { background:#fff; border-radius:18px; padding:2rem; box-shadow:0 20px 60px rgba(15,23,42,.08); }
+        .page { padding:2rem; max-width: 1200px; margin: 0 auto; }
+        .panel { background:#fff; border-radius:18px; padding:2rem; box-shadow:0 20px 60px rgba(15,23,42,.08); overflow-x: auto;}
         h1 { margin-top:0; }
-        table { width:100%; border-collapse:collapse; margin-top:1.5rem; }
+        table { width:100%; border-collapse:collapse; margin-top:1.5rem; white-space: nowrap; }
         th, td { padding:0.9rem 0.8rem; text-align:left; border-bottom:1px solid #e2e8f0; }
         th { background:#f8fafc; color:#0f172a; }
         tbody tr:hover { background:#f8fafc; }
-        .empty { color:#475569; }
+        .empty { color:#475569; font-style: italic;}
+        .feedback-cell { max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer; }
         .actions { margin-top:1.5rem; display:flex; justify-content:flex-end; }
         .button { padding:0.85rem 1.2rem; border:none; border-radius:12px; background:#2563eb; color:#fff; text-decoration:none; font-weight:700; }
     </style>
@@ -33,6 +34,7 @@
                     <th>Resposta</th>
                     <th>Tempo (ms)</th>
                     <th>Nota do Quiz</th>
+                    <th>Feedback do Usuário</th>
                     <th>Data/Hora</th>
                 </tr>
             </thead>
@@ -53,7 +55,6 @@
 
     async function loadLogs() {
         try {
-            // Consulta o banco ordenando do mais recente para o mais antigo
             const { data, error } = await supabase
                 .from('ConsentRecords')
                 .select('*')
@@ -71,14 +72,13 @@
             document.getElementById('logsTable').style.display = 'table';
             const tbody = document.getElementById('logsBody');
 
-            // Percorre cada registro do banco e cria uma linha na tabela
             data.forEach(item => {
                 const tr = document.createElement('tr');
-                
-                // Formata a data do banco para o horário local do Brasil
                 const date = new Date(item.created_at).toLocaleString('pt-BR');
                 
-                // Exibe só o começo do ID para não quebrar o layout, mas deixa ele todo no title do mouse
+                // Tratamento caso a pessoa não tenha enviado feedback
+                const feedbackText = item.feedback ? item.feedback : '<span class="empty">Sem feedback</span>';
+                
                 tr.innerHTML = `
                     <td title="${item.user_id}">${item.user_id.split('-')[0]}...</td>
                     <td><b>${item.experimental_group}</b></td>
@@ -89,6 +89,7 @@
                     </td>
                     <td>${item.latency_milliseconds}</td>
                     <td><b>${item.quiz_score !== null ? item.quiz_score + '/7' : '-'}</b></td>
+                    <td class="feedback-cell" title="${item.feedback || ''}">${feedbackText}</td>
                     <td>${date}</td>
                 `;
                 tbody.appendChild(tr);
@@ -96,11 +97,10 @@
 
         } catch (err) {
             console.error("Erro ao buscar logs:", err);
-            document.getElementById('loading').innerText = "Erro ao carregar logs. Verifique o console de desenvolvedor (F12).";
+            document.getElementById('loading').innerText = "Erro ao carregar logs. Verifique o console (F12).";
         }
     }
 
-    // Chama a função assim que a página abre
     loadLogs();
 </script>
 </body>
