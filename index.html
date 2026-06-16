@@ -3,41 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Seleção de Termos de Uso</title>
+    <title>Início do Experimento</title>
     <style>
         body { margin: 0; font-family: 'Segoe UI', sans-serif; background:#f0f4f8; color:#0f172a; }
         .page { display:flex; min-height:100vh; align-items:center; justify-content:center; padding:2rem; }
-        .card { background:#fff; border-radius:16px; box-shadow:0 20px 80px rgba(15,23,42,.08); width:100%; max-width:900px; padding:2rem; }
+        .card { background:#fff; border-radius:16px; box-shadow:0 20px 80px rgba(15,23,42,.08); width:100%; max-width:600px; padding:3rem 2rem; text-align: center; }
         h1 { margin:0 0 1rem; font-size:2rem; }
-        p { color:#475569; line-height:1.7; }
-        .choices { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:1rem; margin:2rem 0; }
-        .choice { display:flex; flex-direction:column; padding:1.5rem; border-radius:14px; background:#eff6ff; border:1px solid #c7d2fe; text-decoration:none; color:#1d4ed8; font-weight:700; transition:transform .18s ease, box-shadow .18s ease; }
-        .choice:hover { transform:translateY(-3px); box-shadow:0 14px 35px rgba(15,23,42,.12); }
-        .choice span { margin-top:0.5rem; font-size:0.95rem; font-weight:400; color:#475569; }
-        .controls { display:flex; justify-content:flex-end; gap:1rem; }
-        .button { display:inline-flex; align-items:center; justify-content:center; padding:0.95rem 1.4rem; border-radius:10px; border:none; background:#2563eb; color:#fff; text-decoration:none; font-weight:700; }
-        .button.secondary { background:#64748b; }
+        p { color:#475569; line-height:1.7; margin-bottom: 2.5rem; }
+        .controls { display:flex; justify-content:center; gap:1rem; flex-direction: column; align-items: center; }
+        .button { display:inline-flex; align-items:center; justify-content:center; padding:1.2rem 2rem; border-radius:12px; border:none; background:#2563eb; color:#fff; text-decoration:none; font-weight:700; font-size: 1.1rem; cursor: pointer; transition: transform 0.2s, background 0.2s; width: 100%; max-width: 300px; }
+        .button:hover { background:#1d4ed8; transform: translateY(-2px); }
+        .button.secondary { background:transparent; color:#64748b; font-size: 0.9rem; padding: 0.5rem; }
+        .button.secondary:hover { background: transparent; color: #0f172a; text-decoration: underline; transform: none; }
     </style>
 </head>
 <body>
 <div class="page">
     <section class="card">
-        <h1>Escolha o termo de uso</h1>
-        <p>Selecione a variante A ou B para exibir o termo de compromisso correspondente.</p>
-        <div class="choices">
-            <a class="choice" href="termo.html?tipo=A">
-                Termo A
-                <span>Versão padrão.</span>
-            </a>
-            <a class="choice" href="termo.html?tipo=B">
-                Termo B
-                <span>Versão alternativa.</span>
-            </a>
-        </div>
+        <h1>Avaliação de Termos de Uso</h1>
+        <p>Você será redirecionado para ler um termo de compromisso. Por favor, leia o documento com atenção, pois faremos algumas perguntas sobre ele a seguir.</p>
+        
         <div class="controls">
-            <a class="button secondary" href="logs.html">Ver logs registrados</a>
+            <button id="btnStart" class="button">Iniciar Leitura</button>
+            <a class="button secondary" href="logs.html">Ver painel de pesquisador (Logs)</a>
         </div>
     </section>
 </div>
+
+<script>
+    document.getElementById('btnStart').addEventListener('click', () => {
+        // Sorteia 'A' ou 'B' com 50% de chance para cada
+        const tipoSorteado = Math.random() < 0.5 ? 'A' : 'B';
+        // Redireciona o usuário
+        window.location.href = `termo.html?tipo=${tipoSorteado}`;
+    });
+</script>
 </body>
 </html>
