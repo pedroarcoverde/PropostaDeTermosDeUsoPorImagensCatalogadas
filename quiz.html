@@ -17,7 +17,7 @@
 <body class="p-4 md:p-8 flex justify-center">
 
     <div class="max-w-3xl w-full">
-        <div class="mb-8 text-center">
+        <div class="mb-8 text-center" id="quizHeader">
             <h1 class="text-3xl font-black text-slate-900">Teste de Compreensão</h1>
             <p class="text-slate-500 mt-2">Responda às perguntas abaixo baseando-se nos Termos que você acabou de ler.</p>
         </div>
@@ -35,9 +35,14 @@
             <p class="text-lg text-slate-600 mt-2">Sua pontuação de compreensão: <span id="scoreDisplay" class="font-black text-indigo-600 text-3xl"></span>/7</p>
             <p class="text-sm text-slate-500 mt-4">Os dados do seu tempo de leitura e nota foram salvos para a pesquisa.</p>
             
-            <div id="feedbackSection" class="hidden mt-10 text-left bg-indigo-50 p-6 rounded-2xl border border-indigo-100">
-                <h3 class="text-xl font-black text-indigo-900 mb-2">E se os Termos fossem mais simples?</h3>
-                <p class="text-sm text-indigo-700 mb-4 leading-relaxed">Você leu o nosso <b>Termo Padrão</b> (texto corrido). Como parte desta pesquisa, estamos testando o uso de <i>Visual Law</i> — uma técnica que usa ícones e resumos para facilitar a leitura. Veja como o mesmo termo poderia ser apresentado a você:</p>
+            <div id="feedbackSectionA" class="hidden mt-10 text-left bg-indigo-50 p-6 rounded-2xl border border-indigo-100">
+                <h3 class="text-xl font-black text-indigo-900 mb-2">Sobre este TCC: E se os Termos fossem mais simples?</h3>
+                <p class="text-sm text-indigo-700 mb-4 leading-relaxed">
+                    Você leu o nosso <b>Termo Padrão</b> (texto corrido e longo). O objetivo deste Trabalho de Conclusão de Curso (TCC) é estudar soluções reais para o problema de ninguém ler os Termos de Uso.
+                    <br><br>
+                    Para isso, estamos testando uma abordagem chamada <b>Visual Law</b>, que transforma blocos maciços de texto em componentes visuais, utilizando cores semânticas e ícones para facilitar o entendimento das permissões.
+                    Veja abaixo um pequeno exemplo de como o mesmo termo que você leu poderia ter sido apresentado:
+                </p>
                 
                 <div class="bg-white p-4 rounded-xl border border-indigo-200 mb-5 flex flex-wrap gap-4 justify-center pointer-events-none">
                     <div class="w-28 p-3 border-2 border-blue-500 bg-blue-50 rounded-xl text-center">
@@ -54,11 +59,34 @@
                     </div>
                 </div>
 
-                <label for="feedbackText" class="block text-sm font-bold text-indigo-900 mb-2">O que você achou dessa alternativa visual? Facilitaria seu entendimento?</label>
-                <textarea id="feedbackText" class="w-full p-3 border border-indigo-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none resize-none" rows="3" placeholder="Sua opinião ajudará no desenvolvimento do projeto..."></textarea>
+                <label for="feedbackTextA" class="block text-sm font-bold text-indigo-900 mb-2">Considerando a sua experiência, essa alternativa visual facilitaria seu entendimento?</label>
+                <textarea id="feedbackTextA" class="w-full p-3 border border-indigo-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none resize-none" rows="3" placeholder="Deixe seu feedback (opcional)..."></textarea>
                 
-                <button type="button" onclick="alert('Feedback salvo! Muito obrigado por contribuir com a pesquisa.'); this.innerText='Enviado!'; this.disabled=true; this.classList.add('opacity-50');" class="mt-3 w-full sm:w-auto bg-indigo-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-indigo-700 transition-all shadow-md">Enviar Opinião</button>
+                <button type="button" id="btnSendFeedbackA" class="mt-3 w-full sm:w-auto bg-indigo-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-indigo-700 transition-all shadow-md">Enviar Opinião</button>
             </div>
+
+            <div id="feedbackSectionB" class="hidden mt-10 text-left bg-indigo-50 p-6 rounded-2xl border border-indigo-100">
+                <h3 class="text-xl font-black text-indigo-900 mb-2">Sobre este TCC: Você experimentou o Visual Law!</h3>
+                <p class="text-sm text-indigo-700 mb-4 leading-relaxed">
+                    Você acabou de interagir com o nosso protótipo experimental. O objetivo deste Trabalho de Conclusão de Curso (TCC) é testar se o <b>Visual Law</b> — o uso de ícones, cores semânticas e textos curtos — melhora a compreensão e a transparência em comparação com os "textões" tradicionais dos Termos de Uso.
+                </p>
+                
+                <label for="feedbackTextB" class="block text-sm font-bold text-indigo-900 mb-2">Como foi sua experiência? Os ícones e a divisão por cards ajudaram a entender o que estava sendo aceito?</label>
+                <textarea id="feedbackTextB" class="w-full p-3 border border-indigo-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none resize-none" rows="3" placeholder="Sua opinião sincera ajudará a embasar a pesquisa... (opcional)"></textarea>
+                
+                <button type="button" id="btnSendFeedbackB" class="mt-3 w-full sm:w-auto bg-indigo-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-indigo-700 transition-all shadow-md">Enviar Opinião</button>
+            </div>
+            
+            <div class="mt-6 text-center">
+                <a href="index.html" class="text-slate-500 hover:text-indigo-600 text-sm font-medium transition-colors underline">Não quero dar feedback, voltar ao início</a>
+            </div>
+        </div>
+
+        <div id="thankYouScreen" class="hidden text-center bg-white p-12 rounded-2xl shadow-xl border border-slate-200 mt-8">
+            <i data-lucide="heart" class="w-20 h-20 text-red-500 mx-auto mb-4 animate-bounce"></i>
+            <h2 class="text-3xl font-black text-slate-900 mb-2">Muito Obrigado!</h2>
+            <p class="text-slate-600 mb-8">Sua contribuição e feedback são essenciais para o sucesso deste Trabalho de Conclusão de Curso.</p>
+            <a href="index.html" class="bg-slate-900 text-white px-8 py-3 rounded-xl font-bold hover:bg-slate-800 transition-all">Voltar para o Início</a>
         </div>
     </div>
 
@@ -66,15 +94,13 @@
         import { supabase } from './supabaseClient.js';
         lucide.createIcons();
         
-        // ------------------------------------------------------------------
-        // REGRA DE BLOQUEIO DE PÁGINA (Impede o usuário de voltar ao Termo)
-        // ------------------------------------------------------------------
         history.pushState(null, null, location.href);
         window.onpopstate = function () {
             history.go(1); // Joga o usuário para frente imediatamente se ele tentar voltar
         };
 
-        // Perguntas Universais (Testam a eficácia da comunicação de ambos os modelos)
+        let currentUserId = null; // Variável global para guardar o ID e usar no feedback
+
         const questions = [
             { q: "1. O fornecimento de dados básicos de cadastro é obrigatório para usar o serviço?", options: ["Sim, não é possível usar sem eles.", "Não, o aplicativo funciona 100% anonimamente.", "Sim, mas eu sou pago por isso."], answer: 0 },
             { q: "2. Com relação ao compartilhamento de dados com empresas terceiras, qual é a finalidade informada?", options: ["Para fins de investigações policiais.", "Para fins de marketing parceiro e publicidade.", "A empresa garante que nunca compartilha com terceiros."], answer: 1 },
@@ -99,16 +125,16 @@
             container.innerHTML += `<div class="question-card"><p class="font-bold text-slate-800 mb-3">${qObj.q}</p><div class="flex flex-col gap-2">${optionsHtml}</div></div>`;
         });
 
+        // FUNÇÃO DE ENVIO DO QUIZ
         document.getElementById('quizForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
-            // Desabilita todos os inputs
             const inputs = document.querySelectorAll('input[type="radio"]');
             inputs.forEach(input => input.disabled = true);
             
-            // Esconde o botão
             const btn = document.getElementById('submitBtn');
             btn.style.display = 'none';
+            btn.innerHTML = 'Salvando...';
 
             let score = 0;
             questions.forEach((qObj, index) => {
@@ -135,17 +161,21 @@
 
                 if (error) throw error;
 
-                // Mostra o resultado
+                // Guarda o ID para poder atualizar o feedback depois
+                currentUserId = tempConsent.user_id;
+
                 document.getElementById('quizForm').classList.add('hidden');
+                document.getElementById('quizHeader').classList.add('hidden');
                 document.getElementById('resultScreen').classList.remove('hidden');
                 document.getElementById('scoreDisplay').innerText = score;
                 
-                // SE O USUÁRIO FOR DO GRUPO A (Tradicional), MOSTRA O FEEDBACK DO TERMO B
+                // Exibe a seção de feedback correta baseada no grupo
                 if (tempConsent.experimental_group === 'A') {
-                    document.getElementById('feedbackSection').classList.remove('hidden');
-                    // Recria os ícones do Lucide dentro da nova caixa que apareceu
-                    lucide.createIcons();
+                    document.getElementById('feedbackSectionA').classList.remove('hidden');
+                } else {
+                    document.getElementById('feedbackSectionB').classList.remove('hidden');
                 }
+                lucide.createIcons();
 
                 sessionStorage.removeItem('temp_consent');
 
@@ -153,9 +183,49 @@
                 console.error(err);
                 alert('Falha ao salvar. Tente novamente.');
                 btn.style.display = 'flex';
-                inputs.forEach(input => input.disabled = false);
+                btn.disabled = false;
             }
         });
+
+        // LÓGICA DE ENVIO DO FEEDBACK
+        async function submitFeedback(group) {
+            const btn = document.getElementById(`btnSendFeedback${group}`);
+            const textInput = document.getElementById(`feedbackText${group}`);
+            const textValue = textInput.value.trim();
+
+            if (!textValue) {
+                alert("Por favor, digite alguma coisa antes de enviar.");
+                return;
+            }
+
+            btn.innerHTML = 'Enviando...';
+            btn.disabled = true;
+
+            try {
+                const { error } = await supabase
+                    .from('ConsentRecords')
+                    .update({ feedback: textValue })
+                    .eq('user_id', currentUserId);
+
+                if (error) throw error;
+
+                // Troca para a tela de agradecimento
+                document.getElementById('resultScreen').classList.add('hidden');
+                document.getElementById('thankYouScreen').classList.remove('hidden');
+                lucide.createIcons();
+
+            } catch (err) {
+                console.error(err);
+                alert("Erro ao enviar feedback. Tente novamente.");
+                btn.innerHTML = 'Enviar Opinião';
+                btn.disabled = false;
+            }
+        }
+
+        // Atrela os eventos aos botões
+        document.getElementById('btnSendFeedbackA').addEventListener('click', () => submitFeedback('A'));
+        document.getElementById('btnSendFeedbackB').addEventListener('click', () => submitFeedback('B'));
+
     </script>
 </body>
 </html>

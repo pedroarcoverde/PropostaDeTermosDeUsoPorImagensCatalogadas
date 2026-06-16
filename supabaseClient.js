@@ -1,4 +1,4 @@
-// Importa o Supabase via CDN (ideal para projetos estáticos HTML/JS puro)
+// Importa o Supabase via CDN
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm'
 
 const supabaseUrl = 'https://pkljcjsdlndkxnybavpk.supabase.co';
