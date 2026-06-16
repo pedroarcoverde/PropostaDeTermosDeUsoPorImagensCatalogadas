@@ -35,6 +35,30 @@
             <p class="text-lg text-slate-600 mt-2">Sua pontuação de compreensão: <span id="scoreDisplay" class="font-black text-indigo-600 text-3xl"></span>/7</p>
             <p class="text-sm text-slate-500 mt-4">Os dados do seu tempo de leitura e nota foram salvos para a pesquisa.</p>
             
+            <div id="feedbackSection" class="hidden mt-10 text-left bg-indigo-50 p-6 rounded-2xl border border-indigo-100">
+                <h3 class="text-xl font-black text-indigo-900 mb-2">E se os Termos fossem mais simples?</h3>
+                <p class="text-sm text-indigo-700 mb-4 leading-relaxed">Você leu o nosso <b>Termo Padrão</b> (texto corrido). Como parte desta pesquisa, estamos testando o uso de <i>Visual Law</i> — uma técnica que usa ícones e resumos para facilitar a leitura. Veja como o mesmo termo poderia ser apresentado a você:</p>
+                
+                <div class="bg-white p-4 rounded-xl border border-indigo-200 mb-5 flex flex-wrap gap-4 justify-center pointer-events-none">
+                    <div class="w-28 p-3 border-2 border-blue-500 bg-blue-50 rounded-xl text-center">
+                        <i data-lucide="user-search" class="w-6 h-6 text-blue-700 mx-auto mb-1"></i>
+                        <span class="text-[10px] font-bold text-blue-800 uppercase tracking-tight block">Coleta</span>
+                    </div>
+                    <div class="w-28 p-3 border-2 border-orange-500 bg-orange-50 rounded-xl text-center">
+                        <i data-lucide="share-2" class="w-6 h-6 text-orange-700 mx-auto mb-1"></i>
+                        <span class="text-[10px] font-bold text-orange-800 uppercase tracking-tight block">Terceiros</span>
+                    </div>
+                    <div class="w-28 p-3 border-2 border-green-500 bg-green-50 rounded-xl text-center">
+                        <i data-lucide="shield-check" class="w-6 h-6 text-green-700 mx-auto mb-1"></i>
+                        <span class="text-[10px] font-bold text-green-800 uppercase tracking-tight block">Segurança</span>
+                    </div>
+                </div>
+
+                <label for="feedbackText" class="block text-sm font-bold text-indigo-900 mb-2">O que você achou dessa alternativa visual? Facilitaria seu entendimento?</label>
+                <textarea id="feedbackText" class="w-full p-3 border border-indigo-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none resize-none" rows="3" placeholder="Sua opinião ajudará no desenvolvimento do projeto..."></textarea>
+                
+                <button type="button" onclick="alert('Feedback salvo! Muito obrigado por contribuir com a pesquisa.'); this.innerText='Enviado!'; this.disabled=true; this.classList.add('opacity-50');" class="mt-3 w-full sm:w-auto bg-indigo-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-indigo-700 transition-all shadow-md">Enviar Opinião</button>
+            </div>
         </div>
     </div>
 
@@ -42,6 +66,14 @@
         import { supabase } from './supabaseClient.js';
         lucide.createIcons();
         
+        // ------------------------------------------------------------------
+        // REGRA DE BLOQUEIO DE PÁGINA (Impede o usuário de voltar ao Termo)
+        // ------------------------------------------------------------------
+        history.pushState(null, null, location.href);
+        window.onpopstate = function () {
+            history.go(1); // Joga o usuário para frente imediatamente se ele tentar voltar
+        };
+
         // Perguntas Universais (Testam a eficácia da comunicação de ambos os modelos)
         const questions = [
             { q: "1. O fornecimento de dados básicos de cadastro é obrigatório para usar o serviço?", options: ["Sim, não é possível usar sem eles.", "Não, o aplicativo funciona 100% anonimamente.", "Sim, mas eu sou pago por isso."], answer: 0 },
@@ -70,14 +102,13 @@
         document.getElementById('quizForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
-            // 1. Desabilita todos os inputs imediatamente
+            // Desabilita todos os inputs
             const inputs = document.querySelectorAll('input[type="radio"]');
             inputs.forEach(input => input.disabled = true);
             
-            // 2. Esconde o botão de envio
+            // Esconde o botão
             const btn = document.getElementById('submitBtn');
             btn.style.display = 'none';
-            btn.innerHTML = 'Salvando...';
 
             let score = 0;
             questions.forEach((qObj, index) => {
@@ -104,24 +135,25 @@
 
                 if (error) throw error;
 
-                // 3. Trava o fluxo: Adiciona estado ao histórico para impedir o "Voltar"
-                history.pushState(null, null, location.href);
-                window.onpopstate = function () {
-                    history.go(1);
-                };
-
                 // Mostra o resultado
                 document.getElementById('quizForm').classList.add('hidden');
                 document.getElementById('resultScreen').classList.remove('hidden');
                 document.getElementById('scoreDisplay').innerText = score;
                 
+                // SE O USUÁRIO FOR DO GRUPO A (Tradicional), MOSTRA O FEEDBACK DO TERMO B
+                if (tempConsent.experimental_group === 'A') {
+                    document.getElementById('feedbackSection').classList.remove('hidden');
+                    // Recria os ícones do Lucide dentro da nova caixa que apareceu
+                    lucide.createIcons();
+                }
+
                 sessionStorage.removeItem('temp_consent');
 
             } catch (err) {
                 console.error(err);
                 alert('Falha ao salvar. Tente novamente.');
                 btn.style.display = 'flex';
-                btn.disabled = false;
+                inputs.forEach(input => input.disabled = false);
             }
         });
     </script>
