@@ -146,12 +146,23 @@
 
         const container = document.getElementById('questionsContainer');
         questions.forEach((qObj, index) => {
+            
+            // Cria um array de objetos guardando o texto e o índice original de cada opção
+            let shuffledOptions = qObj.options.map((opt, optIdx) => {
+                return { text: opt, originalIndex: optIdx };
+            });
+
+            // Embaralha o array aleatoriamente
+            shuffledOptions.sort(() => Math.random() - 0.5);
+
             let optionsHtml = '';
-            qObj.options.forEach((opt, optIdx) => {
+            
+            // Renderiza as opções embaralhadas, mas mantém o value igual ao índice original
+            shuffledOptions.forEach((optObj) => {
                 optionsHtml += `
                     <label class="option-label">
-                        <input type="radio" name="q${index}" value="${optIdx}" class="accent-indigo-600" required>
-                        <span>${opt}</span>
+                        <input type="radio" name="q${index}" value="${optObj.originalIndex}" class="accent-indigo-600" required>
+                        <span>${optObj.text}</span>
                     </label>
                 `;
             });
