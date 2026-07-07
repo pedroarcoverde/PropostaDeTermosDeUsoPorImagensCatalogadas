@@ -48,12 +48,12 @@
     </main>
 
     
-    <div id="lgpd-modal" class="fixed hidden z-50 bg-slate-900 text-white p-5 rounded-2xl shadow-2xl max-w-xs pointer-events-none transition-opacity duration-200 opacity-0">
+    <div id="legal-modal" class="fixed hidden z-50 bg-slate-900 text-white p-5 rounded-2xl shadow-2xl max-w-xs pointer-events-none transition-opacity duration-200 opacity-0">
         <div class="flex items-center gap-2 mb-2">
             <i data-lucide="scale" class="w-5 h-5 text-indigo-400"></i>
-            <h3 id="lgpd-title" class="text-lg font-black text-indigo-400"></h3>
+            <h3 id="legal-title" class="text-lg font-black text-indigo-400"></h3>
         </div>
-        <p id="lgpd-desc" class="text-sm leading-relaxed text-slate-300"></p>
+        <p id="legal-desc" class="text-sm leading-relaxed text-slate-300"></p>
     </div>
 
 
@@ -131,7 +131,7 @@
             "dpv": "Data Privacy Vocabulary (W3C). Esta é uma marcação de metadados legível por máquina para garantir interoperabilidade de sistemas."
         };
 
-        // Funções para mostrar e esconder a modal da LGPD
+        // Funções para mostrar e esconder a modal
         window.showLegalModal = function(framework, reference) {
             const modal = document.getElementById('legal-modal');
             document.getElementById('legal-title').innerText = `${framework.toUpperCase()} - ${reference}`;
@@ -141,15 +141,15 @@
             setTimeout(() => modal.classList.remove('opacity-0'), 10);
         };
 
-        window.hideLgpdModal = function() {
-            const modal = document.getElementById('lgpd-modal');
+        window.hideLegalModal = function() {
+            const modal = document.getElementById('legal-modal');
             modal.classList.add('opacity-0');
             setTimeout(() => modal.classList.add('hidden'), 200);
         };
 
         // Faz a modal seguir o mouse
         document.addEventListener('mousemove', (e) => {
-            const modal = document.getElementById('lgpd-modal');
+            const modal = document.getElementById('legal-modal');
             if (!modal.classList.contains('hidden')) {
                 modal.style.left = (e.clientX + 15) + 'px';
                 modal.style.top = (e.clientY + 15) + 'px';
@@ -159,6 +159,7 @@
         // Gera as tags de cards para o Termo B (Agora com os eventos de Mouse)
         const cardsHTML = taxonomyRegistry.map(item => {
             let controlUI = '';
+            let cardStyle = item.colorClass;
 
             if (cardStyle === 'color-info') {
                 cardStyle = 'border-slate-200 bg-slate-50 text-slate-700';
@@ -278,7 +279,13 @@
             document.getElementById('term-title').innerText = termosDb[tipo].title;
             document.getElementById('term-subtitle').innerText = termosDb[tipo].subtitle;
             document.getElementById('badge-version').innerText = termosDb[tipo].badge;
-            document.getElementById('badge-iso').innerText = termosDb[tipo].isoBadge;
+            
+            // Corrige o erro do badge-iso (só injeta se ele existir no HTML)
+            const badgeIsoElement = document.getElementById('badge-iso');
+            if (badgeIsoElement && termosDb[tipo].isoBadge) {
+                badgeIsoElement.innerText = termosDb[tipo].isoBadge;
+            }
+
             document.getElementById('term-content').innerHTML = termosDb[tipo].content;
             document.getElementById('actions-container').innerHTML = termosDb[tipo].actions;
 
