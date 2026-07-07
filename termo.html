@@ -19,6 +19,7 @@
         .color-attention { border-color: #f97316; background-color: #fff7ed; color: #9a3412; }
         .color-security { border-color: #22c55e; background-color: #f0fdf4; color: #166534; }
         .color-critical { border-color: #ef4444; background-color: #fef2f2; color: #991b1b; }
+        
         .icon-card { transition: all 0.3s ease; }
         .icon-card:hover { transform: translateY(-2px); box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); }
         .toggle-checkbox { width: 1.25rem; height: 1.25rem; cursor: pointer; border-radius: 0.25rem; }
@@ -46,58 +47,96 @@
         
     </main>
 
+    
+    <div id="lgpd-modal" class="fixed hidden z-50 bg-slate-900 text-white p-5 rounded-2xl shadow-2xl max-w-xs pointer-events-none transition-opacity duration-200 opacity-0">
+        <div class="flex items-center gap-2 mb-2">
+            <i data-lucide="scale" class="w-5 h-5 text-indigo-400"></i>
+            <h3 id="lgpd-title" class="text-lg font-black text-indigo-400"></h3>
+        </div>
+        <p id="lgpd-desc" class="text-sm leading-relaxed text-slate-300"></p>
+    </div>
+
+
     <script>
         // =========================================================
         // DADOS DO TERMO B (protótipo Visual Law)
         // =========================================================
         const taxonomyRegistry = [
             {
-                id: "essential_collect", label: "Coleta de Dados", description: "Dados cadastrais necessários para executar o serviço.",
-                icon: "user-search", colorClass: "color-service", type: "essential",
-                legal: { lgpd: ["Art.7, V", "Art.9"] }
+                id: "coleta_dados", label: "Coleta e Tipos de Dado", description: "Dados cadastrais necessários para executar o serviço.",
+                icon: "database", colorClass: "color-service", type: "essential",
+                legal: { lgpd: "Art. 5º", gdpr: "Art. 13", dpv: "dpv:PersonalData" }
             },
             {
-                id: "third_parties", label: "Terceiros", description: "Compartilhamento para fins de marketing parceiro.",
+                id: "finalidade", label: "Finalidade do Tratamento", description: "O motivo exato pelo qual precisamos dos seus dados.",
+                icon: "target", colorClass: "color-service", type: "essential",
+                legal: { lgpd: "Art. 6º I", gdpr: "Art. 5(1)(b)", dpv: "dpv:Purpose" }
+            },
+            {
+                id: "compartilhamento", label: "Compartilhamento", description: "Envio de dados para terceiros e parceiros comerciais.",
                 icon: "share-2", colorClass: "color-attention", type: "optional",
-                legal: { lgpd: ["Art.7, I"] }
+                legal: { lgpd: "Art. 7º §5º", gdpr: "Art. 13(1)(e)", dpv: "dpv:Recipient" }
             },
             {
-                id: "security", label: "Segurança", description: "Proteção contra fraudes e criptografia de ponta.",
-                icon: "shield-check", colorClass: "color-security", type: "info",
-                legal: { lgpd: ["Art.46"] }
+                id: "cookies_rastreamento", label: "Cookies e Rastreamento", description: "Monitoramento de comportamento para anúncios.",
+                icon: "cookie", colorClass: "color-attention", type: "optional",
+                legal: { lgpd: "Art. 7º", gdpr: "ePrivacy", dpv: "dpv:Tracking" }
             },
             {
-                id: "geolocation", label: "Localização", description: "Rastreamento GPS em tempo real para recursos extras.",
-                icon: "map-pin", colorClass: "color-attention", type: "optional",
-                legal: { lgpd: ["Art.7, I"] }
+                id: "transferencia_int", label: "Transferência Internacional", description: "Armazenamento em servidores fora do seu país.",
+                icon: "globe", colorClass: "color-attention", type: "info",
+                legal: { lgpd: "Art. 33", gdpr: "Art. 44", dpv: "dpv:DataTransfer" }
             },
             {
-                id: "erasure", label: "Rescisão", description: "Seu direito de solicitar exclusão definitiva dos dados.",
-                icon: "log-out", colorClass: "color-critical", type: "info",
-                legal: { lgpd: ["Art.18, VI"] }
+                id: "ia_decisoes", label: "Decisões e IA", description: "Uso de Inteligência Artificial para traçar seu perfil.",
+                icon: "cpu", colorClass: "color-critical", type: "optional",
+                legal: { lgpd: "Art. 20", gdpr: "Art. 22", dpv: "dpv:AutomatedDecision" }
             },
             {
-                id: "ip_rights", label: "Propriedade", description: "Licença de uso sobre o conteúdo gerado por você.",
-                icon: "copyright", colorClass: "color-service", type: "optional",
-                legal: { lgpd: ["Art.7, I"] }
+                id: "seguranca", label: "Segurança da Informação", description: "Criptografia e proteção contra acessos indevidos.",
+                icon: "shield", colorClass: "color-security", type: "info",
+                legal: { lgpd: "Art. 46", gdpr: "Art. 32", dpv: "dpv:SecurityMeasure" }
+            },
+            {
+                id: "retencao", label: "Retenção e Descarte", description: "Por quanto tempo guardamos suas informações.",
+                icon: "clock", colorClass: "color-info", type: "info",
+                legal: { lgpd: "Art. 15", gdpr: "Art. 13(2)", dpv: "dpv:StorageDuration" }
+            },
+            {
+                id: "direitos", label: "Direitos do Titular", description: "Seu direito de ver, corrigir ou portar seus dados.",
+                icon: "user-check", colorClass: "color-security", type: "info",
+                legal: { lgpd: "Art. 18", gdpr: "Art. 15 ao 22", dpv: "dpv:DataSubjectRight" }
+            },
+            {
+                id: "base_legal", label: "Base Legal", description: "A justificativa jurídica para processarmos o dado.",
+                icon: "scale", colorClass: "color-service", type: "info",
+                legal: { lgpd: "Art. 7º", gdpr: "Art. 6º", dpv: "dpv:LegalBasis" }
+            },
+            {
+                id: "dpo_contato", label: "Contato do DPO", description: "Fale com o encarregado de proteção de dados.",
+                icon: "mail", colorClass: "color-service", type: "info",
+                legal: { lgpd: "Art. 41", gdpr: "Art. 37", dpv: "dpv:DPO" }
+            },
+            {
+                id: "alteracoes", label: "Alterações da Política", description: "Como avisaremos se estas regras mudarem.",
+                icon: "history", colorClass: "color-service", type: "info",
+                legal: { lgpd: "Art. 8º", gdpr: "Art. 13", dpv: "dpv:PolicyChange" }
             }
         ];
 
-        // Gera as tags de cards para o Termo B
-        // Dicionário de Leis da LGPD
-        const lgpdDb = {
-            "Art.7, V": { title: "Art. 7º, Inciso V", desc: "Permite o uso dos dados quando estritamente necessário para a execução do contrato ou serviço solicitado." },
-            "Art.7, I": { title: "Art. 7º, Inciso I", desc: "Permite o uso de dados apenas mediante o seu consentimento livre, informado e inequívoco." },
-            "Art.9": { title: "Artigo 9º", desc: "Garante o seu direito a informações claras, precisas e facilmente acessíveis sobre como seus dados são usados." },
-            "Art.18, VI": { title: "Art. 18º, Inciso VI", desc: "Assegura o seu direito de solicitar a eliminação definitiva dos dados pessoais." },
-            "Art.46": { title: "Artigo 46º", desc: "Obriga a empresa a adotar medidas de segurança técnicas para proteger seus dados contra acessos não autorizados." }
+        // Dicionário de Explicações (LGPD, GDPR, DPV)
+        const legalDb = {
+            "lgpd": "A Lei Geral de Proteção de Dados (Brasil) regula esta atividade, garantindo proteção e direitos ao cidadão brasileiro.",
+            "gdpr": "O Regulamento Geral de Proteção de Dados (União Europeia) é o padrão ouro global que fundamenta esta cláusula.",
+            "dpv": "Data Privacy Vocabulary (W3C). Esta é uma marcação de metadados legível por máquina para garantir interoperabilidade de sistemas."
         };
 
         // Funções para mostrar e esconder a modal da LGPD
-        window.showLgpdModal = function(art) {
-            const modal = document.getElementById('lgpd-modal');
-            document.getElementById('lgpd-title').innerText = lgpdDb[art]?.title || art;
-            document.getElementById('lgpd-desc').innerText = lgpdDb[art]?.desc || "Descrição legal.";
+        window.showLegalModal = function(framework, reference) {
+            const modal = document.getElementById('legal-modal');
+            document.getElementById('legal-title').innerText = `${framework.toUpperCase()} - ${reference}`;
+            document.getElementById('legal-desc').innerText = legalDb[framework.toLowerCase()] || "Fundamentação regulatória.";
+            
             modal.classList.remove('hidden');
             setTimeout(() => modal.classList.remove('opacity-0'), 10);
         };
@@ -120,6 +159,11 @@
         // Gera as tags de cards para o Termo B (Agora com os eventos de Mouse)
         const cardsHTML = taxonomyRegistry.map(item => {
             let controlUI = '';
+
+            if (cardStyle === 'color-info') {
+                cardStyle = 'border-slate-200 bg-slate-50 text-slate-700';
+            }
+
             if (item.type === 'essential') {
                 controlUI = `<span class="mt-3 inline-block text-[10px] font-bold uppercase tracking-wider bg-white/70 px-2 py-1 rounded shadow-sm opacity-90">Essencial (Sem Opt-out)</span>`;
             } else if (item.type === 'info') {
@@ -132,20 +176,27 @@
             }
 
             return `
-                <div class="icon-card p-5 border-2 rounded-2xl flex flex-col justify-between ${item.colorClass}">
+                <div class="icon-card p-5 border-2 rounded-2xl flex flex-col justify-between ${cardStyle}">
                     <div>
                         <div class="flex items-center gap-3 mb-2">
-                            <div class="p-2 bg-white/80 rounded-lg shadow-sm"><i data-lucide="${item.icon}" class="w-6 h-6"></i></div>
-                            <span class="font-black text-sm uppercase tracking-tight">${item.label}</span>
+                            <div class="p-2 bg-white/90 rounded-lg shadow-sm"><i data-lucide="${item.icon}" class="w-6 h-6"></i></div>
+                            <span class="font-black text-[13px] uppercase tracking-tight leading-tight">${item.label}</span>
                         </div>
                         <p class="text-xs mt-2 opacity-90 leading-relaxed font-medium">${item.description}</p>
-                        <div class="flex gap-1 mt-2 flex-wrap">
-                            ${item.legal.lgpd.map(art => `
-                                <span class="group relative bg-white/40 px-1.5 py-0.5 rounded text-[8px] font-bold uppercase border border-white/20 cursor-help"
-                                    onmouseenter="showLgpdModal('${art}')" onmouseleave="hideLgpdModal()">
-                                    LGPD ${art}
-                                </span>
-                            `).join('')}
+                        
+                        <div class="flex gap-1.5 mt-3 flex-wrap">
+                            <span class="group relative bg-blue-100/50 text-blue-800 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase border border-blue-200/50 cursor-help"
+                                  onmouseenter="showLegalModal('lgpd', '${item.legal.lgpd}')" onmouseleave="hideLegalModal()">
+                                LGPD
+                            </span>
+                            <span class="group relative bg-indigo-100/50 text-indigo-800 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase border border-indigo-200/50 cursor-help"
+                                  onmouseenter="showLegalModal('gdpr', '${item.legal.gdpr}')" onmouseleave="hideLegalModal()">
+                                GDPR
+                            </span>
+                            <span class="group relative bg-emerald-100/50 text-emerald-800 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase border border-emerald-200/50 cursor-help"
+                                  onmouseenter="showLegalModal('dpv', '${item.legal.dpv}')" onmouseleave="hideLegalModal()">
+                                DPV
+                            </span>
                         </div>
                     </div>
                     <div>${controlUI}</div>
@@ -227,6 +278,7 @@
             document.getElementById('term-title').innerText = termosDb[tipo].title;
             document.getElementById('term-subtitle').innerText = termosDb[tipo].subtitle;
             document.getElementById('badge-version').innerText = termosDb[tipo].badge;
+            document.getElementById('badge-iso').innerText = termosDb[tipo].isoBadge;
             document.getElementById('term-content').innerHTML = termosDb[tipo].content;
             document.getElementById('actions-container').innerHTML = termosDb[tipo].actions;
 
@@ -237,11 +289,5 @@
 
     <script src="telemetry.js"></script>
 </body>
-<div id="lgpd-modal" class="fixed hidden z-50 bg-slate-900 text-white p-5 rounded-2xl shadow-2xl max-w-xs pointer-events-none transition-opacity duration-200 opacity-0">
-    <div class="flex items-center gap-2 mb-2">
-        <i data-lucide="scale" class="w-5 h-5 text-indigo-400"></i>
-        <h3 id="lgpd-title" class="text-lg font-black text-indigo-400"></h3>
-    </div>
-    <p id="lgpd-desc" class="text-sm leading-relaxed text-slate-300"></p>
-</div>
+
 </html>
