@@ -16,7 +16,7 @@
 </head>
 <body class="p-4 md:p-8 flex justify-center">
 
-    <div class="max-w-3xl w-full">
+    <div class="max-w-4xl w-full">
         <div class="mb-8 text-center" id="quizHeader">
             <h1 class="text-3xl font-black text-slate-900">Teste de Compreensão</h1>
             <p class="text-slate-500 mt-2">Responda às perguntas abaixo baseando-se nos Termos que você acabou de ler.</p>
@@ -40,29 +40,29 @@
                 <div class="mb-8">
                     <h3 class="text-2xl font-black text-indigo-900 mb-2">Por que a transparência importa?</h3>
                     <p class="text-sm text-indigo-700 leading-relaxed mb-4">
-                        Você leu o <b>Termo de Uso Tradicional</b>. Agora, compare-o com a nossa proposta de <b>Visual Law</b> abaixo.
+                        Você acabou de ler o <b>Termo de Uso Tradicional</b> (texto corrido). Agora, compare a sua experiência com a nossa proposta experimental de <b>Visual Law</b> estruturada abaixo.
                     </p>
 
                     <div class="grid md:grid-cols-2 gap-4 mb-6">
                         <div class="bg-white p-4 rounded-xl border border-indigo-100">
-                            <h4 class="font-bold text-indigo-800 text-sm mb-1">O que é Opcional (Opt-in)?</h4>
-                            <p class="text-[12px] text-slate-600">São escolhas que respeitam sua autonomia. Você decide o que compartilhar com terceiros ou se deseja ativar recursos como GPS.</p>
+                            <h4 class="font-bold text-indigo-800 text-sm mb-1">Categorização Visual</h4>
+                            <p class="text-[12px] text-slate-600">Em vez de um texto denso, dividimos o documento em 12 categorias vitais (como IA, Cookies e Retenção), facilitando a leitura rápida e focada.</p>
                         </div>
                         <div class="bg-white p-4 rounded-xl border border-indigo-100">
-                            <h4 class="font-bold text-indigo-800 text-sm mb-1">Por que há itens obrigatórios?</h4>
-                            <p class="text-[12px] text-slate-600">Dados essenciais são a base do serviço. Sem eles, o contrato não se sustenta tecnicamente. O Visual Law os destaca para evitar confusão.</p>
+                            <h4 class="font-bold text-indigo-800 text-sm mb-1">Controle Real (Opt-in)</h4>
+                            <p class="text-[12px] text-slate-600">O modelo visual separa claramente o que é essencial do que é opcional. Ele permite habilitar ou bloquear rastreamento e compartilhamento de forma interativa.</p>
                         </div>
                     </div>
                 </div>
 
                 <div id="fullTermBContainer" class="bg-white p-6 rounded-2xl border border-indigo-200 shadow-sm mb-8 pointer-events-none">
                     <h4 class="font-black text-slate-800 mb-4 uppercase tracking-widest text-sm border-b pb-2">Privacidade Transparente (Visual Law)</h4>
-                    <div id="termBCardsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div id="termBCardsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                         </div>
                 </div>
 
                 <label for="feedbackTextA" class="block text-sm font-bold text-indigo-900 mb-2">
-                    A clareza do modelo visual acima facilitaria sua tomada de decisão?
+                    A clareza do modelo visual acima facilitaria a sua tomada de decisão?
                 </label>
                 <textarea id="feedbackTextA" class="w-full p-3 border border-indigo-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none resize-none" rows="3" placeholder="Sua opinião é fundamental para o TCC..."></textarea>
                 
@@ -72,7 +72,7 @@
             <div id="feedbackSectionB" class="hidden mt-10 text-left bg-indigo-50 p-6 rounded-2xl border border-indigo-100">
                 <h3 class="text-xl font-black text-indigo-900 mb-2">Você experimentou o Visual Law!</h3>
                 <p class="text-sm text-indigo-700 mb-4 leading-relaxed">
-                    Você acabou de interagir com o nosso protótipo experimental. O objetivo deste Trabalho de Conclusão de Curso é testar se o <b>Visual Law</b> — o uso de ícones, cores semânticas e textos curtos — melhora a compreensão e a transparência em comparação com os "textões" tradicionais dos Termos de Uso.
+                    Você acabou de interagir com o nosso protótipo experimental. O objetivo deste Trabalho de Conclusão de Curso é testar se o <b>Visual Law</b> — o uso de ícones, cores semânticas e categorização progressiva — melhora a compreensão e a transparência em comparação com os "textões" tradicionais dos Termos de Uso.
                 </p>
                 
                 <label for="feedbackTextB" class="block text-sm font-bold text-indigo-900 mb-2">Como foi sua experiência? Os ícones e a divisão por cards ajudaram a entender o que estava sendo aceito?</label>
@@ -103,61 +103,64 @@
             history.go(1); // Joga o usuário para frente imediatamente se ele tentar voltar
         };
 
-        let currentUserId = null; // Variável global para guardar o ID e usar no feedback
+        let currentUserId = null;
 
+        // Novas Perguntas Alinhadas aos 12 Cards do Novo Termo
         const questions = [
-            { q: "1. O fornecimento de dados básicos de cadastro é obrigatório para usar o serviço?", options: ["Sim, não é possível usar sem eles.", "Não, o aplicativo funciona 100% anonimamente.", "Sim, mas eu sou pago por isso."], answer: 0 },
-            { q: "2. Com relação ao compartilhamento de dados com empresas terceiras, qual é a finalidade informada?", options: ["Para fins de investigações policiais.", "Para fins de marketing parceiro e publicidade.", "A empresa garante que nunca compartilha com terceiros."], answer: 1 },
-            { q: "3. O aplicativo realiza o rastreamento da sua localização física (GPS)?", options: ["Não, é proibido por lei.", "Sim, rastreia em tempo real para recursos extras.", "Apenas o CEP da residência."], answer: 1 },
-            { q: "4. Sobre a segurança das suas informações, o termo afirma que o aplicativo utiliza:", options: ["Criptografia de ponta e proteção contra fraudes.", "Apenas senhas básicas de 4 dígitos.", "Nenhuma medida tecnológica."], answer: 0 },
-            { q: "5. Se você decidir parar de usar o serviço, o que você tem o direito de solicitar?", options: ["A exclusão e eliminação definitiva dos seus dados.", "Que os dados fiquem congelados por 10 anos.", "Transferir a conta para outra pessoa."], answer: 0 },
-            { q: "6. Sobre o conteúdo (textos, fotos) que você gera na plataforma, de quem são os direitos de uso?", options: ["Ficam em domínio público.", "A empresa passa a ter licença e propriedade sobre eles.", "Pertencem ao governo federal."], answer: 1 },
-            { q: "7. A permissão para rastrear o seu GPS é classificada no termo como:", options: ["Um dado essencial (obrigatório).", "Uma permissão opcional (Opt-in).", "Um dado que não existe."], answer: 1 }
+            { q: "1. O fornecimento de dados básicos de cadastro é obrigatório para usar o serviço?", options: ["Sim, não é possível usar sem eles.", "Não, o aplicativo funciona 100% anonimamente.", "Sim, mas há uma recompensa financeira."], answer: 0 },
+            { q: "2. Com relação ao compartilhamento de dados com terceiros, qual é a finalidade principal?", options: ["Para fins de investigações policiais rotineiras.", "Envio de dados para terceiros e parceiros comerciais.", "A empresa garante que nunca compartilha dados."], answer: 1 },
+            { q: "3. Qual é o propósito do uso de Cookies e Rastreamento descrito no termo?", options: ["Apenas para manter você logado.", "Monitoramento de comportamento para exibir anúncios.", "Melhorar a velocidade de conexão da sua internet."], answer: 1 },
+            { q: "4. O termo menciona o uso de Inteligência Artificial (IA) para qual finalidade?", options: ["Traçar o seu perfil de uso e consumo.", "Criar imagens automáticas para o seu perfil.", "Ajudar no suporte técnico automatizado."], answer: 0 },
+            { q: "5. O que significa a cláusula de Transferência Internacional?", options: ["Que você pode usar o aplicativo durante viagens.", "Armazenamento das suas informações em servidores fora do seu país.", "Que suas compras internacionais não terão taxas."], answer: 1 },
+            { q: "6. Quais são os Direitos do Titular garantidos a você?", options: ["O direito de ver, corrigir ou portar (exportar) seus dados.", "O direito de não ver anúncios nunca mais.", "O direito de processar a empresa sem provas."], answer: 0 },
+            { q: "7. Caso haja alguma dúvida sobre seus dados, com quem você deve entrar em contato?", options: ["Com o suporte da Apple ou do Google.", "Diretamente com o CEO da empresa.", "Com o Encarregado de Proteção de Dados (DPO)."], answer: 2 }
         ];
 
-        // Dados necessários para renderizar o Termo B (Taxonomia)
+        // Novo Banco de Dados de Termos (12 Categorias) com classes Tailwind embutidas
         const taxonomyRegistry = [
-            { id: "essential_collect", label: "Coleta de Dados", description: "Dados cadastrais necessários para executar o serviço.", icon: "user-search", colorClass: "color-service", type: "essential" },
-            { id: "third_parties", label: "Terceiros", description: "Compartilhamento para fins de marketing parceiro.", icon: "share-2", colorClass: "color-attention", type: "optional" },
-            { id: "security", label: "Segurança", description: "Proteção contra fraudes e criptografia de ponta.", icon: "shield-check", colorClass: "color-security", type: "info" },
-            { id: "geolocation", label: "Localização", description: "Rastreamento GPS em tempo real para recursos extras.", icon: "map-pin", colorClass: "color-attention", type: "optional" },
-            { id: "erasure", label: "Rescisão", description: "Seu direito de solicitar exclusão definitiva dos dados.", icon: "log-out", colorClass: "color-critical", type: "info" },
-            { id: "ip_rights", label: "Propriedade", description: "Licença de uso sobre o conteúdo gerado por você.", icon: "copyright", colorClass: "color-service", type: "optional" }
+            { id: "coleta_dados", label: "Coleta de Dado", description: "Dados cadastrais necessários para executar o serviço.", icon: "database", twClass: "border-blue-500 bg-blue-50 text-blue-900", type: "essential" },
+            { id: "finalidade", label: "Finalidade", description: "O motivo exato pelo qual precisamos dos seus dados.", icon: "target", twClass: "border-blue-500 bg-blue-50 text-blue-900", type: "essential" },
+            { id: "compartilhamento", label: "Compartilhamento", description: "Envio de dados para terceiros e parceiros comerciais.", icon: "share-2", twClass: "border-orange-500 bg-orange-50 text-orange-900", type: "optional" },
+            { id: "cookies_rastreamento", label: "Cookies", description: "Monitoramento de comportamento para anúncios.", icon: "cookie", twClass: "border-orange-500 bg-orange-50 text-orange-900", type: "optional" },
+            { id: "transferencia_int", label: "Transf. Int.", description: "Armazenamento em servidores fora do seu país.", icon: "globe", twClass: "border-orange-500 bg-orange-50 text-orange-900", type: "info" },
+            { id: "ia_decisoes", label: "Decisões e IA", description: "Uso de Inteligência Artificial para traçar seu perfil.", icon: "cpu", twClass: "border-red-500 bg-red-50 text-red-900", type: "optional" },
+            { id: "seguranca", label: "Segurança", description: "Criptografia e proteção contra acessos indevidos.", icon: "shield", twClass: "border-green-500 bg-green-50 text-green-900", type: "info" },
+            { id: "retencao", label: "Retenção", description: "Por quanto tempo guardamos suas informações.", icon: "clock", twClass: "border-slate-300 bg-slate-50 text-slate-700", type: "info" },
+            { id: "direitos", label: "Direitos", description: "Seu direito de ver, corrigir ou portar seus dados.", icon: "user-check", twClass: "border-green-500 bg-green-50 text-green-900", type: "info" },
+            { id: "base_legal", label: "Base Legal", description: "A justificativa jurídica para processarmos o dado.", icon: "scale", twClass: "border-blue-500 bg-blue-50 text-blue-900", type: "info" },
+            { id: "dpo_contato", label: "Contato do DPO", description: "Fale com o encarregado de proteção de dados.", icon: "mail", twClass: "border-blue-500 bg-blue-50 text-blue-900", type: "info" },
+            { id: "alteracoes", label: "Alterações", description: "Como avisaremos se estas regras mudarem.", icon: "history", twClass: "border-blue-500 bg-blue-50 text-blue-900", type: "info" }
         ];
 
-        // Função que renderiza o Termo B dentro do quiz
         function renderTermBPreview() {
             const grid = document.getElementById('termBCardsGrid');
             grid.innerHTML = taxonomyRegistry.map(item => `
-                <div class="p-4 border-2 rounded-xl flex flex-col justify-between ${item.colorClass.replace('color-', 'bg-').replace('color-', 'border-')} border-blue-200">
-                    <div class="flex items-center gap-2 mb-2">
-                        <i data-lucide="${item.icon}" class="w-5 h-5"></i>
-                        <span class="font-black text-xs uppercase">${item.label}</span>
+                <div class="p-4 border-2 rounded-xl flex flex-col justify-between ${item.twClass}">
+                    <div>
+                        <div class="flex items-center gap-2 mb-2">
+                            <i data-lucide="${item.icon}" class="w-5 h-5"></i>
+                            <span class="font-black text-[11px] uppercase tracking-tight leading-tight">${item.label}</span>
+                        </div>
+                        <p class="text-[10px] leading-relaxed mb-3 opacity-90 font-medium">${item.description}</p>
                     </div>
-                    <p class="text-[10px] leading-relaxed mb-3 opacity-80">${item.description}</p>
-                    <span class="text-[9px] font-bold uppercase bg-white/50 px-2 py-1 rounded w-fit">
-                        ${item.type === 'essential' ? 'Obrigatório' : item.type === 'optional' ? 'Opt-in' : 'Informativo'}
-                    </span>
+                    <div class="mt-auto border-t border-black/10 pt-2">
+                        <span class="text-[9px] font-bold uppercase bg-black/10 px-2 py-1 rounded inline-block w-fit">
+                            ${item.type === 'essential' ? 'Obrigatório' : item.type === 'optional' ? 'Opt-in (Opcional)' : 'Informativo'}
+                        </span>
+                    </div>
                 </div>
             `).join('');
-            
-            // Aplicar estilos de cor manualmente 
         }
 
         const container = document.getElementById('questionsContainer');
         questions.forEach((qObj, index) => {
-            
-            // Cria um array de objetos guardando o texto e o índice original de cada opção
             let shuffledOptions = qObj.options.map((opt, optIdx) => {
                 return { text: opt, originalIndex: optIdx };
             });
 
-            // Embaralha o array aleatoriamente
             shuffledOptions.sort(() => Math.random() - 0.5);
 
             let optionsHtml = '';
-            
-            // Renderiza as opções embaralhadas, mas mantém o value igual ao índice original
             shuffledOptions.forEach((optObj) => {
                 optionsHtml += `
                     <label class="option-label">
@@ -169,7 +172,7 @@
             container.innerHTML += `<div class="question-card"><p class="font-bold text-slate-800 mb-3">${qObj.q}</p><div class="flex flex-col gap-2">${optionsHtml}</div></div>`;
         });
 
-        // FUNÇÃO DE ENVIO DO QUIZ
+        // ENVIO DO QUIZ
         document.getElementById('quizForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
@@ -205,7 +208,6 @@
 
                 if (error) throw error;
 
-                // Guarda o ID para poder atualizar o feedback depois
                 currentUserId = tempConsent.user_id;
 
                 document.getElementById('quizForm').classList.add('hidden');
@@ -213,10 +215,9 @@
                 document.getElementById('resultScreen').classList.remove('hidden');
                 document.getElementById('scoreDisplay').innerText = score;
                 
-                // Exibe a seção de feedback correta baseada no grupo
                 if (tempConsent.experimental_group === 'A') {
                     document.getElementById('feedbackSectionA').classList.remove('hidden');
-                    renderTermBPreview(); // Renderiza o preview do Termo B para o grupo A
+                    renderTermBPreview(); 
                 } else {
                     document.getElementById('feedbackSectionB').classList.remove('hidden');
                 }
@@ -254,7 +255,6 @@
 
                 if (error) throw error;
 
-                // Troca para a tela de agradecimento
                 document.getElementById('resultScreen').classList.add('hidden');
                 document.getElementById('thankYouScreen').classList.remove('hidden');
                 lucide.createIcons();
@@ -267,10 +267,8 @@
             }
         }
 
-        // Atrela os eventos aos botões
         document.getElementById('btnSendFeedbackA').addEventListener('click', () => submitFeedback('A'));
         document.getElementById('btnSendFeedbackB').addEventListener('click', () => submitFeedback('B'));
-
     </script>
 </body>
 </html>
