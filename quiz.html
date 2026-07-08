@@ -118,18 +118,23 @@
 
         // Novo Banco de Dados de Termos (12 Categorias) com classes Tailwind embutidas
         const taxonomyRegistry = [
-            { id: "coleta_dados", label: "Coleta de Dado", description: "Dados cadastrais necessários para executar o serviço.", icon: "database", twClass: "border-blue-500 bg-blue-50 text-blue-900", type: "essential" },
-            { id: "finalidade", label: "Finalidade", description: "O motivo exato pelo qual precisamos dos seus dados.", icon: "target", twClass: "border-blue-500 bg-blue-50 text-blue-900", type: "essential" },
+            { id: "ia_decisoes", label: "Decisões e IA", description: "Uso de Inteligência Artificial para traçar seu perfil.", icon: "cpu", twClass: "border-red-500 bg-red-50 text-red-900", type: "optional" },
+            
             { id: "compartilhamento", label: "Compartilhamento", description: "Envio de dados para terceiros e parceiros comerciais.", icon: "share-2", twClass: "border-orange-500 bg-orange-50 text-orange-900", type: "optional" },
             { id: "cookies_rastreamento", label: "Cookies", description: "Monitoramento de comportamento para anúncios.", icon: "cookie", twClass: "border-orange-500 bg-orange-50 text-orange-900", type: "optional" },
             { id: "transferencia_int", label: "Transf. Int.", description: "Armazenamento em servidores fora do seu país.", icon: "globe", twClass: "border-orange-500 bg-orange-50 text-orange-900", type: "info" },
-            { id: "ia_decisoes", label: "Decisões e IA", description: "Uso de Inteligência Artificial para traçar seu perfil.", icon: "cpu", twClass: "border-red-500 bg-red-50 text-red-900", type: "optional" },
+            
             { id: "seguranca", label: "Segurança", description: "Criptografia e proteção contra acessos indevidos.", icon: "shield", twClass: "border-green-500 bg-green-50 text-green-900", type: "info" },
-            { id: "retencao", label: "Retenção", description: "Por quanto tempo guardamos suas informações.", icon: "clock", twClass: "border-slate-300 bg-slate-50 text-slate-700", type: "info" },
             { id: "direitos", label: "Direitos", description: "Seu direito de ver, corrigir ou portar seus dados.", icon: "user-check", twClass: "border-green-500 bg-green-50 text-green-900", type: "info" },
+            
+            { id: "retencao", label: "Retenção", description: "Por quanto tempo guardamos suas informações.", icon: "clock", twClass: "border-slate-300 bg-slate-50 text-slate-700", type: "info" },
+            
+            { id: "coleta_dados", label: "Coleta de Dado", description: "Dados cadastrais necessários para executar o serviço.", icon: "database", twClass: "border-blue-500 bg-blue-50 text-blue-900", type: "essential" },
+            { id: "finalidade", label: "Finalidade", description: "O motivo exato pelo qual precisamos dos seus dados.", icon: "target", twClass: "border-blue-500 bg-blue-50 text-blue-900", type: "essential" },
             { id: "base_legal", label: "Base Legal", description: "A justificativa jurídica para processarmos o dado.", icon: "scale", twClass: "border-blue-500 bg-blue-50 text-blue-900", type: "info" },
             { id: "dpo_contato", label: "Contato do DPO", description: "Fale com o encarregado de proteção de dados.", icon: "mail", twClass: "border-blue-500 bg-blue-50 text-blue-900", type: "info" },
             { id: "alteracoes", label: "Alterações", description: "Como avisaremos se estas regras mudarem.", icon: "history", twClass: "border-blue-500 bg-blue-50 text-blue-900", type: "info" }
+            
         ];
 
         function renderTermBPreview() {

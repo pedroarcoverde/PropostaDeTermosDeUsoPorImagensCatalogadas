@@ -58,20 +58,15 @@
 
 
     <script>
-        // =========================================================
-        // DADOS DO TERMO B (protótipo Visual Law)
-        // =========================================================
+        // DADOS DO TERMO B 
         const taxonomyRegistry = [
+
             {
-                id: "coleta_dados", label: "Coleta e Tipos de Dado", description: "Dados cadastrais necessários para executar o serviço.",
-                icon: "database", colorClass: "color-service", type: "essential",
-                legal: { lgpd: "Art. 5º", gdpr: "Art. 13", dpv: "dpv:PersonalData" }
+                id: "ia_decisoes", label: "Decisões e IA", description: "Uso de Inteligência Artificial para traçar seu perfil.",
+                icon: "cpu", colorClass: "color-critical", type: "optional",
+                legal: { lgpd: "Art. 20", gdpr: "Art. 22", dpv: "dpv:AutomatedDecision" }
             },
-            {
-                id: "finalidade", label: "Finalidade do Tratamento", description: "O motivo exato pelo qual precisamos dos seus dados.",
-                icon: "target", colorClass: "color-service", type: "essential",
-                legal: { lgpd: "Art. 6º I", gdpr: "Art. 5(1)(b)", dpv: "dpv:Purpose" }
-            },
+
             {
                 id: "compartilhamento", label: "Compartilhamento", description: "Envio de dados para terceiros e parceiros comerciais.",
                 icon: "share-2", colorClass: "color-attention", type: "optional",
@@ -87,25 +82,33 @@
                 icon: "globe", colorClass: "color-attention", type: "info",
                 legal: { lgpd: "Art. 33", gdpr: "Art. 44", dpv: "dpv:DataTransfer" }
             },
-            {
-                id: "ia_decisoes", label: "Decisões e IA", description: "Uso de Inteligência Artificial para traçar seu perfil.",
-                icon: "cpu", colorClass: "color-critical", type: "optional",
-                legal: { lgpd: "Art. 20", gdpr: "Art. 22", dpv: "dpv:AutomatedDecision" }
-            },
+
             {
                 id: "seguranca", label: "Segurança da Informação", description: "Criptografia e proteção contra acessos indevidos.",
                 icon: "shield", colorClass: "color-security", type: "info",
                 legal: { lgpd: "Art. 46", gdpr: "Art. 32", dpv: "dpv:SecurityMeasure" }
             },
             {
+                id: "direitos", label: "Direitos do Titular", description: "Seu direito de ver, corrigir ou portar seus dados.",
+                icon: "user-check", colorClass: "color-security", type: "info",
+                legal: { lgpd: "Art. 18", gdpr: "Art. 15 ao 22", dpv: "dpv:DataSubjectRight" }
+            },
+
+            {
                 id: "retencao", label: "Retenção e Descarte", description: "Por quanto tempo guardamos suas informações.",
                 icon: "clock", colorClass: "color-info", type: "info",
                 legal: { lgpd: "Art. 15", gdpr: "Art. 13(2)", dpv: "dpv:StorageDuration" }
             },
+
             {
-                id: "direitos", label: "Direitos do Titular", description: "Seu direito de ver, corrigir ou portar seus dados.",
-                icon: "user-check", colorClass: "color-security", type: "info",
-                legal: { lgpd: "Art. 18", gdpr: "Art. 15 ao 22", dpv: "dpv:DataSubjectRight" }
+                id: "coleta_dados", label: "Coleta e Tipos de Dado", description: "Dados cadastrais necessários para executar o serviço.",
+                icon: "database", colorClass: "color-service", type: "essential",
+                legal: { lgpd: "Art. 5º", gdpr: "Art. 13", dpv: "dpv:PersonalData" }
+            },
+            {
+                id: "finalidade", label: "Finalidade do Tratamento", description: "O motivo exato pelo qual precisamos dos seus dados.",
+                icon: "target", colorClass: "color-service", type: "essential",
+                legal: { lgpd: "Art. 6º I", gdpr: "Art. 5(1)(b)", dpv: "dpv:Purpose" }
             },
             {
                 id: "base_legal", label: "Base Legal", description: "A justificativa jurídica para processarmos o dado.",
@@ -122,6 +125,7 @@
                 icon: "history", colorClass: "color-service", type: "info",
                 legal: { lgpd: "Art. 8º", gdpr: "Art. 13", dpv: "dpv:PolicyChange" }
             }
+
         ];
 
         // Dicionário de Explicações (LGPD, GDPR, DPV)
@@ -131,7 +135,7 @@
             "dpv": "Data Privacy Vocabulary (W3C). Esta é uma marcação de metadados legível por máquina para garantir interoperabilidade de sistemas."
         };
 
-        // Funções para mostrar e esconder a modal
+        
         window.showLegalModal = function(framework, reference) {
             const modal = document.getElementById('legal-modal');
             document.getElementById('legal-title').innerText = `${framework.toUpperCase()} - ${reference}`;
