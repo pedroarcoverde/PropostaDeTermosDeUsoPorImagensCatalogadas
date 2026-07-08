@@ -16,7 +16,6 @@ O sistema foi estruturado em quatro camadas integradas, garantindo coerência en
 ## 🚀 Funcionalidades
 - **Iconografia Semântica:** Mapeamento visual intuitivo para cláusulas complexas.
 - **Transparência Informacional:** Redução da carga cognitiva via *Nudges* visuais.
-- **Auditoria Facilitada:** Painel de controle para consulta do histórico de consentimentos.
 - **Padronização:** Alinhamento com frameworks de privacidade (ISO 29100, NIST Privacy Framework).
 
 ## 🛠️ Tecnologias Utilizadas
