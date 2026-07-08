@@ -60,13 +60,7 @@
     <script>
         // DADOS DO TERMO B
         const taxonomyRegistry = [
-
-            {
-                id: "ia_decisoes", label: "Decisões e IA", description: "Uso de Inteligência Artificial para traçar seu perfil.",
-                icon: "cpu", colorClass: "color-critical", type: "optional",
-                legal: { lgpd: "Art. 20", gdpr: "Art. 22", dpv: "dpv:AutomatedDecision" }
-            },
-
+            
             {
                 id: "compartilhamento", label: "Compartilhamento", description: "Envio de dados para terceiros e parceiros comerciais.",
                 icon: "share-2", colorClass: "color-attention", type: "optional",
@@ -82,7 +76,13 @@
                 icon: "globe", colorClass: "color-attention", type: "info",
                 legal: { lgpd: "Art. 33", gdpr: "Art. 44", dpv: "dpv:DataTransfer" }
             },
-
+            
+            {
+                id: "ia_decisoes", label: "Decisões e IA", description: "Uso de Inteligência Artificial para traçar seu perfil.",
+                icon: "cpu", colorClass: "color-critical", type: "optional",
+                legal: { lgpd: "Art. 20", gdpr: "Art. 22", dpv: "dpv:AutomatedDecision" }
+            },
+            
             {
                 id: "seguranca", label: "Segurança da Informação", description: "Criptografia e proteção contra acessos indevidos.",
                 icon: "shield", colorClass: "color-security", type: "info",
