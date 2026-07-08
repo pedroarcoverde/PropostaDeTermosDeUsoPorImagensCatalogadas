@@ -105,7 +105,7 @@
 
         let currentUserId = null;
 
-        // Novas Perguntas Alinhadas aos 12 Cards do Novo Termo
+        // Perguntas alinhadas aos termos de uso
         const questions = [
             { q: "1. O fornecimento de dados básicos de cadastro é obrigatório para usar o serviço?", options: ["Sim, não é possível usar sem eles.", "Não, o aplicativo funciona 100% anonimamente.", "Sim, mas há uma recompensa financeira."], answer: 0 },
             { q: "2. Com relação ao compartilhamento de dados com terceiros, qual é a finalidade principal?", options: ["Para fins de investigações policiais rotineiras.", "Envio de dados para terceiros e parceiros comerciais.", "A empresa garante que nunca compartilha dados."], answer: 1 },
@@ -116,7 +116,7 @@
             { q: "7. Caso haja alguma dúvida sobre seus dados, com quem você deve entrar em contato?", options: ["Com o suporte da Apple ou do Google.", "Diretamente com o CEO da empresa.", "Com o Encarregado de Proteção de Dados (DPO)."], answer: 2 }
         ];
 
-        // Novo Banco de Dados de Termos (12 Categorias) com classes Tailwind embutidas
+        // Banco de Dados de Termos
         const taxonomyRegistry = [
             { id: "ia_decisoes", label: "Decisões e IA", description: "Uso de Inteligência Artificial para traçar seu perfil.", icon: "cpu", twClass: "border-red-500 bg-red-50 text-red-900", type: "optional" },
             

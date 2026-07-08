@@ -7,7 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        /* Estilos específicos para o Termo A (Wall of text) */
+        /* Estilos específicos para o Termo A */
         .wall-of-text {
             max-height: 50vh;
             overflow-y: auto;
@@ -58,7 +58,7 @@
 
 
     <script>
-        // DADOS DO TERMO B 
+        // DADOS DO TERMO B
         const taxonomyRegistry = [
 
             {
@@ -151,7 +151,6 @@
             setTimeout(() => modal.classList.add('hidden'), 200);
         };
 
-        // Faz a modal seguir o mouse
         document.addEventListener('mousemove', (e) => {
             const modal = document.getElementById('legal-modal');
             if (!modal.classList.contains('hidden')) {
@@ -160,7 +159,7 @@
             }
         });
 
-        // Gera as tags de cards para o Termo B (Agora com os eventos de Mouse)
+        // Gera as tags de cards para o Termo B 
         const cardsHTML = taxonomyRegistry.map(item => {
             let controlUI = '';
             let cardStyle = item.colorClass;
@@ -209,15 +208,13 @@
             `;
         }).join('');
 
-        // =========================================================
-        // BANCO DE TERMOS (A = Tradicional / B = Visual Law)
-        // =========================================================
+        // BANCO DE TERMOS 
         const termosDb = {
             'A': {
                 title: 'Termos de Uso e Política de Privacidade',
                 subtitle: 'Contrato de Adesão Padrão',
                 badge: 'v1.0 Tradicional',
-                // TEXTO MASSIVO (Grupo de Controle)
+                
                 content: `
                     <div class="wall-of-text text-sm text-justify text-slate-600 space-y-4 pr-4">
                         <p><strong>BEM-VINDO AOS TERMOS DE USO. LEIA ESTE DOCUMENTO COM ATENÇÃO.</strong></p>
@@ -255,7 +252,7 @@
                 title: 'Privacidade Transparente',
                 subtitle: 'Nós valorizamos sua privacidade. Ajuste abaixo o que faz sentido para você.',
                 badge: 'v2.1.0 Visual Law',
-                // CARDS COM ÍCONES (Grupo Experimental)
+                
                 content: `
                     <p class="text-slate-500 text-sm mb-6 font-medium">Controle como seus dados são utilizados. Finalidades essenciais já estão garantidas para a prestação do serviço principal.</p>
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -284,7 +281,7 @@
             }
         };
 
-        // Carrega a interface correta baseada na URL
+        // Carrega a interface baseada na URL
         document.addEventListener("DOMContentLoaded", () => {
             const urlParams = new URLSearchParams(window.location.search);
             const tipo = urlParams.get('tipo') || 'A';
