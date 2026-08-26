@@ -226,7 +226,7 @@
 
         setTimeout(() => {
             // Sorteia 'A' ou 'B' com 50% de chance para cada (Teste A/B)
-            const tipoSorteado = Math.random() < 0.5 ? 'A' : 'B';
+            const tipoSorteado =  'B';//Math.random() < 0.5 ? 'A' : 'B';
             // Redireciona o usuário
             window.location.href = `termo.html?tipo=${tipoSorteado}`;
         }, 500); // Pequeno delay para UX
