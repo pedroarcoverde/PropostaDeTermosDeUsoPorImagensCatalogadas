@@ -50,10 +50,187 @@ plt.rcParams.update({
     'axes.labelsize': 11
 })
 
+from scipy.stats import fisher_exact
+
+
+# ==========================================
+# Gráfico da Taxa de Aceite com IC 95%
+# ==========================================
+
+# Dados observados
+aceites = np.array([34, 32])
+totais = np.array([40, 41])
+
+grupos = ['Grupo A (Texto)', 'Grupo B (Visual)']
+cores = ['#0072F0', '#F02020']
+
+# Proporções e taxas em porcentagem
+proporcoes = aceites / totais
+taxas = proporcoes * 100
+
+# ------------------------------------------
+# Intervalos de confiança de 95%
+# Método de Wald, para manter compatibilidade
+# com os intervalos apresentados na sua tabela.
+# ------------------------------------------
+
+z = 1.96
+
+erros_proporcoes = z * np.sqrt(
+    proporcoes * (1 - proporcoes) / totais
+)
+
+ic_inferior = np.maximum(
+    0, proporcoes - erros_proporcoes
+) * 100
+
+ic_superior = np.minimum(
+    1, proporcoes + erros_proporcoes
+) * 100
+
+# Erros inferiores e superiores para o Matplotlib
+erros_grafico = np.array([
+    taxas - ic_inferior,
+    ic_superior - taxas
+])
+
+# ------------------------------------------
+# Teste exato de Fisher (bicaudal)
+# ------------------------------------------
+
+# Linhas: Grupos A e B
+# Colunas: Aceitou e Não aceitou
+tabela_contingencia = np.array([
+    [aceites[0], totais[0] - aceites[0]],
+    [aceites[1], totais[1] - aceites[1]]
+])
+
+_, p_fisher = fisher_exact(
+    tabela_contingencia,
+    alternative='two-sided'
+)
+
+# ------------------------------------------
+# Diferença entre proporções: Grupo B - Grupo A
+# IC 95% pelo método de Wald
+# ------------------------------------------
+
+diferenca_pp = (proporcoes[1] - proporcoes[0]) * 100
+
+erro_diferenca = z * np.sqrt(
+    proporcoes[0] * (1 - proporcoes[0]) / totais[0]
+    + proporcoes[1] * (1 - proporcoes[1]) / totais[1]
+) * 100
+
+ic_diferenca_inferior = diferenca_pp - erro_diferenca
+ic_diferenca_superior = diferenca_pp + erro_diferenca
+
+# ------------------------------------------
+# Construção do gráfico
+# ------------------------------------------
+
+fig, ax = plt.subplots(figsize=(7, 5), dpi=300)
+
+x = np.arange(len(grupos))
+
+barras = ax.bar(
+    x,
+    taxas,
+    width=0.55,
+    color=cores,
+    edgecolor='black',
+    linewidth=0.7,
+    zorder=2
+)
+
+# Barras de erro: IC 95%
+ax.errorbar(
+    x,
+    taxas,
+    yerr=erros_grafico,
+    fmt='none',
+    ecolor='black',
+    elinewidth=1.5,
+    capsize=7,
+    capthick=1.5,
+    zorder=3
+)
+
+# Porcentagem e quantidade acima de cada intervalo
+for i, (barra, taxa, superior) in enumerate(
+    zip(barras, taxas, ic_superior)
+):
+    ax.text(
+        barra.get_x() + barra.get_width() / 2,
+        superior + 1.0,
+        f'{taxa:.2f}%\n({aceites[i]}/{totais[i]})',
+        ha='center',
+        va='bottom',
+        fontsize=10
+    )
+
+# Título e identificação dos eixos
+ax.set_title(
+    'Taxa de Aceite por Grupo',
+    fontsize=14,
+    pad=18
+)
+
+ax.set_ylabel('Taxa de aceite (%)', fontsize=11)
+ax.set_xticks(x)
+ax.set_xticklabels(grupos, fontsize=10)
+
+ax.set_ylim(0, 125)
+ax.set_yticks(np.arange(0, 101, 20))
+
+# Anotação do teste inferencial
+p_formatado = f'{p_fisher:.3f}'.replace('.', ',')
+
+ax.text(
+    0.5,
+    0.98,
+    f'Teste exato de Fisher (bicaudal): p = {p_formatado}',
+    transform=ax.transAxes,
+    ha='center',
+    va='top',
+    fontsize=10
+)
+
+# Aparência
+ax.grid(
+    axis='y',
+    linestyle='--',
+    alpha=0.35,
+    zorder=0
+)
+ax.set_axisbelow(True)
+
+# Nota com a diferença entre proporções e seu IC
+diferenca_formatada = f'{diferenca_pp:+.2f}'.replace('.', ',')
+ic_inf_formatado = f'{ic_diferenca_inferior:+.1f}'.replace('.', ',')
+ic_sup_formatado = f'{ic_diferenca_superior:+.1f}'.replace('.', ',')
+
+nota = (
+    f'Diferença B − A: {diferenca_formatada} p.p. '
+    f'(IC 95%: {ic_inf_formatado} a {ic_sup_formatado} p.p.)'
+)
+
+fig.text(
+    0.5,
+    0.025,
+    nota,
+    ha='center',
+    va='bottom',
+    fontsize=9
+)
+
+fig.tight_layout(rect=[0, 0.08, 1, 0.96])
+plt.show()
+
+
 # ==========================================
 #  GRÁFICO DE TEMPO DE PERMANÊNCIA
 # ==========================================
-
 
 fig, ax = plt.subplots(figsize=(7, 5), dpi=300)
 
@@ -125,19 +302,13 @@ ax.grid(
 
 ax.set_axisbelow(True)
 
-# Legenda explicativa
-from matplotlib.lines import Line2D
-from matplotlib.patches import Patch
-
-
-
 fig.tight_layout()
 fig.savefig('grafico_3_tMedio.png', dpi=300, bbox_inches='tight')
 plt.show()
 plt.close(fig)
 
 # ==========================================
-# 4. GRÁFICO DE NOTAS MÉDIAS COM IC DE 95%
+#  GRÁFICO DE NOTAS MÉDIAS COM IC DE 95%
 # ==========================================
 
 medias_nota = np.array([
@@ -213,7 +384,7 @@ plt.show()
 plt.close(fig)
 
 # ==========================================
-# 5. RESULTADOS NUMÉRICOS
+# RESULTADOS NUMÉRICOS
 # ==========================================
 
 print('===== TEMPO DE PERMANÊNCIA =====')
@@ -235,10 +406,19 @@ for nome, media, margem, notas in zip(
     print(f'  IC 95%: [{media - margem:.2f}, {media + margem:.2f}]')
     print(f'  Participantes: {len(notas)}')
 
-print('\n===== TAXA DE ACEITAÇÃO =====')
-print(f'Grupo A: {aceite_A:.2f}%')
-print(f'Grupo B: {aceite_B:.2f}%')
+print('\n===== TAXAS DE ACEITE =====')
+for grupo, taxa, inferior, superior in zip(
+    grupos, taxas, ic_inferior, ic_superior
+):
+    print(
+        f'{grupo}: {taxa:.2f}% '
+        f'(IC 95%: {inferior:.1f}% a {superior:.1f}%)'
+    )
 
-print('\nGráficos salvos:')
-print('- grafico_3_tMedio.png')
-print('- grafico_4_notasTempo.png')
+print(f'\nTeste exato de Fisher: p = {p_fisher:.3f}')
+print(
+    f'Diferença B - A: {diferenca_pp:.2f} p.p. '
+    f'(IC 95%: {ic_diferenca_inferior:.1f} a '
+    f'{ic_diferenca_superior:.1f} p.p.)'
+)
+
