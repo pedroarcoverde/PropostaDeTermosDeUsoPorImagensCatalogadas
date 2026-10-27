@@ -1,4 +1,4 @@
-# Proposta de Representação Visual de Termos de Compromisso
+# Proposta de Representação Visual de Termos de Uso
 
 ## 📖 Descrição
 Este projeto é um artefato de software desenvolvido como parte de um Trabalho de Conclusão de Curso (TCC) no curso de Engenharia da Computação da Universidade de Brasília (UnB). 
