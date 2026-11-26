@@ -1,261 +1,161 @@
 import numpy as np
+import pandas as pd
 import matplotlib.pyplot as plt
-from scipy.stats import (
-    t,
-    mannwhitneyu,
-    ttest_ind,
-    fisher_exact,
-    norm,
-)
+from scipy.stats import t, mannwhitneyu, ttest_ind, fisher_exact, norm
 
 # ==========================================
-# 1. DADOS (N = 81: n_A = 40, n_B = 41)
-# ==========================================
+# 1. CARREGAMENTO DIRETO DO XLSX DO REPOSITÓRIO
+# ========================================== 
+df = pd.read_excel("ConsentRecords_rows.xlsx")
+df["created_at"] = pd.to_datetime(df["created_at"], utc=True, errors="coerce")
+df = df.sort_values("created_at").reset_index(drop=True)
 
-# Tempos de permanência convertidos de milissegundos para segundos
-tempo_A = np.array([
-    153314, 178655, 2411, 2113, 35584, 34914, 2425, 224698, 2289, 26085,
-    126324, 1775, 1986, 1732, 169228, 355873, 51026, 200557, 297906, 2722,
-    2099, 2501, 26390, 265514, 251314, 2742, 128301, 2796, 177656, 262811,
-    131173, 213582, 2328, 129699, 108174, 20933, 55873, 98756, 15284, 69599
-], dtype=float) / 1000.0
+df["tempo_s"] = df["latency_milliseconds"].astype(float) / 1000.0
+df["nota"] = df["quiz_score"].astype(float)
+df["aceitou"] = df["has_accepted"].astype(bool)
 
-tempo_B = np.array([
-    2922, 14683, 18771, 3190, 670257, 1785, 78843, 81845, 9568, 2245,
-    59066, 2864, 103981, 3547, 50427, 4565, 2059, 64681, 88688, 22191,
-    87259, 122149, 11432, 65066, 98377, 117025, 1734, 6226, 10722, 1300,
-    97472, 13514, 2628, 224497, 11068, 45328, 1621, 9012, 2548, 24405,
-    149257
-], dtype=float) / 1000.0
+df_A = df[df["experimental_group"] == "A"]
+df_B = df[df["experimental_group"] == "B"]
 
-notas_A = np.array([
-    6, 6, 1, 5, 2, 5, 7, 6, 1, 5, 6, 5, 2, 0, 7, 7, 5, 7, 7, 2,
-    3, 1, 7, 7, 5, 2, 7, 2, 6, 6, 7, 7, 1, 7, 7, 6, 4, 7, 0, 4
-], dtype=float)
+tempo_A, tempo_B = df_A["tempo_s"].to_numpy(), df_B["tempo_s"].to_numpy()
+notas_A, notas_B = df_A["nota"].to_numpy(), df_B["nota"].to_numpy()
 
-notas_B = np.array([
-    6, 6, 3, 7, 6, 3, 7, 7, 5, 3, 6, 2, 5, 6, 7, 6, 2, 4, 6, 5,
-    7, 7, 4, 6, 6, 7, 1, 3, 6, 3, 7, 6, 4, 7, 5, 7, 2, 5, 3, 7, 7
-], dtype=float)
-
-aceites = np.array([34, 32], dtype=int)
-totais = np.array([len(tempo_A), len(tempo_B)], dtype=int)
+print(f"Total lido: N={len(df)} (n_A={len(df_A)}, n_B={len(df_B)})")
 
 # ==========================================
-# 2. FUNÇÕES ESTATÍSTICAS AUXILIARES
+# 2. FUNÇÕES ESTATÍSTICAS
 # ==========================================
-
-def resumo_numerico(x):
+def resumo(x):
     q1, med, q3 = np.percentile(x, [25, 50, 75])
-    iqr = q3 - q1
-    n = len(x)
-    media = np.mean(x)
-    dp = np.std(x, ddof=1)
-    ep = dp / np.sqrt(n)
-    ic_low, ic_high = t.interval(0.95, df=n - 1, loc=media, scale=ep)
-    return {
-        "n": n,
-        "media": media,
-        "dp": dp,
-        "ic95": (ic_low, ic_high),
-        "mediana": med,
-        "q1": q1,
-        "q3": q3,
-        "iqr": iqr,
-    }
+    n, m, dp = len(x), np.mean(x), np.std(x, ddof=1)
+    ic = t.interval(0.95, df=n - 1, loc=m, scale=dp / np.sqrt(n))
+    return n, m, dp, ic, med, q1, q3
 
-def cohens_d_welch(x, y):
+def cohens_d(x, y):
     nx, ny = len(x), len(y)
-    vx, vy = np.var(x, ddof=1), np.var(y, ddof=1)
-    s_pooled = np.sqrt(((nx - 1) * vx + (ny - 1) * vy) / (nx + ny - 2))
-    return (np.mean(y) - np.mean(x)) / s_pooled if s_pooled > 0 else 0.0
+    sp = np.sqrt(((nx - 1) * np.var(x, ddof=1) + (ny - 1) * np.var(y, ddof=1)) / (nx + ny - 2))
+    return (np.mean(y) - np.mean(x)) / sp if sp > 0 else 0.0
 
-def cliff_delta_e_rank_biserial(x, y):
-    # Positivo indica valores maiores em y (Grupo B) do que em x (Grupo A)
-    nx, ny = len(x), len(y)
-    diffs = y[:, None] - x[None, :]
-    gt = np.sum(diffs > 0)
-    lt = np.sum(diffs < 0)
-    delta = (gt - lt) / (nx * ny)
-    # Correlação rank-biserial a partir de U de y sobre x
-    u_y = mannwhitneyu(y, x, alternative="two-sided").statistic
-    r_rb = 1.0 - (2.0 * u_y) / (nx * ny)
-    return delta, r_rb
-
-def hodges_lehmann_diff(x, y, n_boot=5000, seed=42):
-    # Diferença de localização (mediana de y_j - x_i) + IC 95% bootstrap
-    pairwise_diffs = (y[:, None] - x[None, :]).ravel()
-    hl = np.median(pairwise_diffs)
+def cliff_e_hl(x, y, n_boot=4000, seed=42):
+    diffs = (y[:, None] - x[None, :]).ravel()
+    delta = (np.sum(diffs > 0) - np.sum(diffs < 0)) / len(diffs)
+    hl = np.median(diffs)
     rng = np.random.default_rng(seed)
-    boot_vals = np.empty(n_boot)
-    for b in range(n_boot):
-        bx = rng.choice(x, size=len(x), replace=True)
-        by = rng.choice(y, size=len(y), replace=True)
-        boot_vals[b] = np.median((by[:, None] - bx[None, :]).ravel())
-    ci_low, ci_high = np.percentile(boot_vals, [2.5, 97.5])
-    return hl, (ci_low, ci_high)
+    boots = [np.median((rng.choice(y, len(y), True)[:, None] - rng.choice(x, len(x), True)[None, :]).ravel())
+             for _ in range(n_boot)]
+    return delta, hl, np.percentile(boots, [2.5, 97.5])
 
-def comparar_continuas(x, y, nome_x="Grupo A", nome_y="Grupo B"):
-    rx, ry = resumo_numerico(x), resumo_numerico(y)
-    u_stat, p_mw = mannwhitneyu(x, y, alternative="two-sided")
-    u_y = mannwhitneyu(y, x, alternative="two-sided").statistic
-    delta, r_rb = cliff_delta_e_rank_biserial(x, y)
-    hl, hl_ic = hodges_lehmann_diff(x, y)
-    t_welch, p_welch = ttest_ind(x, y, equal_var=False)
-    d_cohen = cohens_d_welch(x, y)
-
-    # Welch em log10 (apenas para tempos estritamente positivos)
+def bloco(titulo, x, y):
+    na, ma, dpa, ica, meda, q1a, q3a = resumo(x)
+    nb, mb, dpb, icb, medb, q1b, q3b = resumo(y)
+    u_a, p_mw = mannwhitneyu(x, y, alternative="two-sided")
+    u_b = na * nb - u_a
+    delta, hl, hl_ic = cliff_e_hl(x, y)
+    tw, pw = ttest_ind(x, y, equal_var=False)
+    d = cohens_d(x, y)
+    print(f"\n--- {titulo} ---")
+    print(f"A (n={na}): media={ma:.2f}±{dpa:.2f} IC[{ica[0]:.2f}; {ica[1]:.2f}] | med={meda:.2f} ({q1a:.2f}-{q3a:.2f})")
+    print(f"B (n={nb}): media={mb:.2f}±{dpb:.2f} IC[{icb[0]:.2f}; {icb[1]:.2f}] | med={medb:.2f} ({q1b:.2f}-{q3b:.2f})")
+    print(f"MW: U_A={u_a:.1f}, U_B={u_b:.1f}, p={p_mw:.4f} | HL(B-A)={hl:.2f} IC[{hl_ic[0]:.2f}; {hl_ic[1]:.2f}] | Cliff={delta:.3f}")
+    print(f"Welch: t={tw:.3f}, p={pw:.4f}, d={d:.3f}")
     if np.all(x > 0) and np.all(y > 0):
-        lx, ly = np.log10(x), np.log10(y)
-        t_log, p_log = ttest_ind(lx, ly, equal_var=False)
-        d_log = cohens_d_welch(lx, ly)
-    else:
-        t_log, p_log, d_log = np.nan, np.nan, np.nan
-
-    return {
-        "rx": rx, "ry": ry,
-        "u_x": u_stat, "u_y": u_y, "p_mw": p_mw,
-        "delta": delta, "r_rb": r_rb,
-        "hl": hl, "hl_ic": hl_ic,
-        "t_welch": t_welch, "p_welch": p_welch, "d_cohen": d_cohen,
-        "t_log": t_log, "p_log": p_log, "d_log": d_log,
-    }
+        tl, pl = ttest_ind(np.log10(x), np.log10(y), equal_var=False)
+        print(f"Welch log10: t={tl:.3f}, p={pl:.4f}")
 
 def wilson_ci(k, n, alpha=0.05):
-    z = norm.ppf(1.0 - alpha / 2.0)
+    z = norm.ppf(1 - alpha / 2)
     p = k / n
-    denom = 1.0 + z**2 / n
-    center = (p + z**2 / (2.0 * n)) / denom
-    half = (z * np.sqrt((p * (1.0 - p) + z**2 / (4.0 * n)) / n)) / denom
-    return max(0.0, center - half), min(1.0, center + half)
+    den = 1 + z**2 / n
+    c = (p + z**2 / (2 * n)) / den
+    h = z * np.sqrt((p * (1 - p) + z**2 / (4 * n)) / n) / den
+    return max(0.0, c - h), min(1.0, c + h)
 
-def newcombe_diff_ci(k1, n1, k2, n2, alpha=0.05):
-    # Diferença p2 - p1 com IC de Newcombe (método 10 / sem continuidade)
+def newcombe_ci(k1, n1, k2, n2):
     p1, p2 = k1 / n1, k2 / n2
-    l1, u1 = wilson_ci(k1, n1, alpha)
-    l2, u2 = wilson_ci(k2, n2, alpha)
+    l1, u1 = wilson_ci(k1, n1)
+    l2, u2 = wilson_ci(k2, n2)
     diff = p2 - p1
-    low = diff - np.sqrt((p2 - l2)**2 + (u1 - p1)**2)
-    high = diff + np.sqrt((u2 - p2)**2 + (p1 - l1)**2)
-    return diff, max(-1.0, low), min(1.0, high)
+    return diff, diff - np.sqrt((p2 - l2)**2 + (u1 - p1)**2), diff + np.sqrt((u2 - p2)**2 + (p1 - l1)**2)
 
-def tost_welch(x, y, margin=0.70, alpha=0.05):
-    # Testa equivalência: H0_1: (mean_y - mean_x) <= -margin; H0_2: (mean_y - mean_x) >= +margin
+def tost_welch(x, y, margin=0.70):
     nx, ny = len(x), len(y)
     vx, vy = np.var(x, ddof=1), np.var(y, ddof=1)
     se = np.sqrt(vx / nx + vy / ny)
-    df = (vx / nx + vy / ny)**2 / ((vx / nx)**2 / (nx - 1) + (vy / ny)**2 / (ny - 1))
+    df_w = (vx / nx + vy / ny)**2 / ((vx / nx)**2 / (nx - 1) + (vy / ny)**2 / (ny - 1))
     diff = np.mean(y) - np.mean(x)
-    t_lower = (diff - (-margin)) / se
-    p_lower = t.sf(t_lower, df=df)
-    t_upper = (diff - margin) / se
-    p_upper = t.cdf(t_upper, df=df)
-    p_tost = max(p_lower, p_upper)
-    return p_tost, p_lower, p_upper, diff, df
-
-def imprimir_bloco_continuo(titulo, res):
-    rx, ry = res["rx"], res["ry"]
-    print(f"\n--- {titulo} ---")
-    print(f"Grupo A (n={rx['n']}): média={rx['media']:.2f} ± {rx['dp']:.2f} "
-          f"[IC95%: {rx['ic95'][0]:.2f}; {rx['ic95'][1]:.2f}], "
-          f"mediana={rx['mediana']:.2f} (Q1-Q3: {rx['q1']:.2f}-{rx['q3']:.2f})")
-    print(f"Grupo B (n={ry['n']}): média={ry['media']:.2f} ± {ry['dp']:.2f} "
-          f"[IC95%: {ry['ic95'][0]:.2f}; {ry['ic95'][1]:.2f}], "
-          f"mediana={ry['mediana']:.2f} (Q1-Q3: {ry['q1']:.2f}-{ry['q3']:.2f})")
-    print(f"Mann-Whitney: U_A={res['u_x']:.1f}, U_B={res['u_y']:.1f}, p={res['p_mw']:.4f} | "
-          f"Hodges-Lehmann (B-A)={res['hl']:.2f} [IC95%: {res['hl_ic'][0]:.2f}; {res['hl_ic'][1]:.2f}] | "
-          f"Cliff delta={res['delta']:.3f}, r_rb={res['r_rb']:.3f}")
-    print(f"Welch bruto: t={res['t_welch']:.3f}, p={res['p_welch']:.4f}, d={res['d_cohen']:.3f}")
-    if not np.isnan(res["p_log"]):
-        print(f"Welch log10: t={res['t_log']:.3f}, p={res['p_log']:.4f}, d_log={res['d_log']:.3f}")
+    p_low = t.sf((diff + margin) / se, df=df_w)
+    p_high = t.cdf((diff - margin) / se, df=df_w)
+    return max(p_low, p_high), p_low, p_high, diff, df_w
 
 # ==========================================
-# 3. ANÁLISES ESTATÍSTICAS
+# 3. SAÍDAS PARA TABELAS 4.1 E 4.2
 # ==========================================
+bloco("TEMPO - Amostra integral (N=81)", tempo_A, tempo_B)
 
-print("==========================================")
-print("1. TEMPO DE PERMANÊNCIA (H1)")
-print("==========================================")
+# Regra simétrica > 300 s (5 min)
+mA_300, mB_300 = tempo_A <= 300.0, tempo_B <= 300.0
+print(f"\nRemovidos (>300 s): A={np.sum(~mA_300)}, B={np.sum(~mB_300)}")
+bloco("TEMPO - Critério simétrico (<= 300 s)", tempo_A[mA_300], tempo_B[mB_300])
 
-res_tempo_full = comparar_continuas(tempo_A, tempo_B)
-imprimir_bloco_continuo("Amostra integral (N = 81)", res_tempo_full)
+# Sem outlier 670 s
+bloco("TEMPO - Sem outlier de 670 s no Grupo B", tempo_A, tempo_B[tempo_B < 600.0])
 
-# Critério simétrico de outlier: > Q3 + 3*IQR (calculado na amostra combinada) ou > 300 s
-tempo_all = np.concatenate([tempo_A, tempo_B])
-q3_all = np.percentile(tempo_all, 75)
-iqr_all = np.percentile(tempo_all, 75) - np.percentile(tempo_all, 25)
-limite_simetrico = min(q3_all + 3.0 * iqr_all, 300.0)
+# Período randomizado (antes de 2026-08-25 21:16 ou primeiros 49 registros ordenados)
+df_rand = df.iloc[:49]
+bloco("TEMPO - Período inicial randomizado (n=49)",
+      df_rand[df_rand["experimental_group"] == "A"]["tempo_s"].to_numpy(),
+      df_rand[df_rand["experimental_group"] == "B"]["tempo_s"].to_numpy())
 
-mask_A_sim = tempo_A <= limite_simetrico
-mask_B_sim = tempo_B <= limite_simetrico
-print(f"\nLimite simétrico adotado: {limite_simetrico:.2f} s "
-      f"(removidos: A={np.sum(~mask_A_sim)}, B={np.sum(~mask_B_sim)})")
-res_tempo_sim = comparar_continuas(tempo_A[mask_A_sim], tempo_B[mask_B_sim])
-imprimir_bloco_continuo("Sensibilidade com critério simétrico", res_tempo_sim)
+# Leitores ativos (>= 3 s)
+a_at, b_at = tempo_A >= 3.0, tempo_B >= 3.0
+bloco("TEMPO - Leitores ativos (>= 3 s)", tempo_A[a_at], tempo_B[b_at])
+bloco("TEMPO - Leitores ativos (>= 3 s, sem >300 s)",
+      tempo_A[a_at & mA_300], tempo_B[b_at & mB_300])
 
-# Sensibilidade sem o outlier isolado de 670,26 s no Grupo B
-mask_B_no670 = tempo_B < 600.0
-res_tempo_no670 = comparar_continuas(tempo_A, tempo_B[mask_B_no670])
-imprimir_bloco_continuo("Sensibilidade sem outlier de 670,26 s no Grupo B", res_tempo_no670)
+bloco("NOTAS - Amostra integral (N=81)", notas_A, notas_B)
+p_tost, pl, ph, dn, dfw = tost_welch(notas_A, notas_B, 0.70)
+print(f"TOST (±0,70 pt, gl={dfw:.1f}): p_TOST={p_tost:.4f} (dif={dn:.2f})")
 
-# Período pseudoaleatório inicial (primeiros 49 registros)
-res_tempo_rand49 = comparar_continuas(tempo_A[:27], tempo_B[:22])
-imprimir_bloco_continuo("Período inicial randomizado (n = 49: 27 A / 22 B)", res_tempo_rand49)
+print(f"\nNOTAS cliques rápidos (< 3 s): A={np.mean(notas_A[~a_at]):.2f} (n={np.sum(~a_at)}) vs B={np.mean(notas_B[~b_at]):.2f} (n={np.sum(~b_at)})")
+bloco("NOTAS - Leitores ativos (>= 3 s)", notas_A[a_at], notas_B[b_at])
+bloco("ACERTOS/MIN - Leitores ativos (>= 3 s)",
+      notas_A[a_at] / (tempo_A[a_at] / 60.0),
+      notas_B[b_at] / (tempo_B[b_at] / 60.0))
 
-# Estratificação: cliques rápidos (< 3 s) vs. leitores ativos (>= 3 s)
-idx_A_rap = tempo_A < 3.0
-idx_B_rap = tempo_B < 3.0
-res_tempo_ativos = comparar_continuas(tempo_A[~idx_A_rap], tempo_B[~idx_B_rap])
-imprimir_bloco_continuo("Leitores ativos (>= 3 s: A n=28, B n=30)", res_tempo_ativos)
-
-print("\n==========================================")
-print("2. NOTAS NO QUESTIONÁRIO (H2) E EFICIÊNCIA")
-print("==========================================")
-
-res_notas_full = comparar_continuas(notas_A, notas_B)
-imprimir_bloco_continuo("Notas na amostra integral (N = 81)", res_notas_full)
-
-p_tost, p_low, p_high, diff_notas, df_notas = tost_welch(notas_A, notas_B, margin=0.70)
-print(f"\nTOST (margem ±0,70 pt, gl={df_notas:.1f}): p_TOST={p_tost:.4f} "
-      f"(p_inf={p_low:.4f}, p_sup={p_high:.4f}), dif_média={diff_notas:.2f}")
-
-# Notas estratificadas por tempo (< 3 s vs. >= 3 s)
-print(f"\nNotas cliques rápidos (< 3 s): "
-      f"A={np.mean(notas_A[idx_A_rap]):.2f} (n={np.sum(idx_A_rap)}) vs. "
-      f"B={np.mean(notas_B[idx_B_rap]):.2f} (n={np.sum(idx_B_rap)})")
-res_notas_ativos = comparar_continuas(notas_A[~idx_A_rap], notas_B[~idx_B_rap])
-imprimir_bloco_continuo("Notas leitores ativos (>= 3 s)", res_notas_ativos)
-
-# Eficiência temporal exploratória: acertos por minuto entre leitores ativos
-eff_A = notas_A[~idx_A_rap] / (tempo_A[~idx_A_rap] / 60.0)
-eff_B = notas_B[~idx_B_rap] / (tempo_B[~idx_B_rap] / 60.0)
-res_eff_ativos = comparar_continuas(eff_A, eff_B)
-imprimir_bloco_continuo("Acertos por minuto (leitores ativos >= 3 s)", res_eff_ativos)
-
-print("\n==========================================")
-print("3. PROPORÇÕES DE CONFIRMAÇÃO (E1 - DESCRITIVO)")
-print("==========================================")
-
-props = aceites / totais
-for nome, k, n, p in zip(["Grupo A", "Grupo B"], aceites, totais, props):
-    w_low, w_high = wilson_ci(k, n)
-    print(f"{nome}: {k}/{n} ({p*100:.2f}%), IC95% Wilson = [{w_low*100:.1f}%; {w_high*100:.1f}%]")
-
-diff_p, nc_low, nc_high = newcombe_diff_ci(aceites[0], totais[0], aceites[1], totais[1])
-_, p_fisher = fisher_exact(
-    np.array([[aceites[0], totais[0] - aceites[0]],
-              [aceites[1], totais[1] - aceites[1]]]),
-    alternative="two-sided"
-)
-print(f"Diferença (B - A): {diff_p*100:+.2f} p.p., IC95% Newcombe = [{nc_low*100:+.1f}; {nc_high*100:+.1f}] p.p. "
-      f"| Fisher (descritivo) p = {p_fisher:.3f}")
+# Proporções (E1)
+kA, nA = int(df_A["aceitou"].sum()), len(df_A)
+kB, nB = int(df_B["aceitou"].sum()), len(df_B)
+wA, wB = wilson_ci(kA, nA), wilson_ci(kB, nB)
+dp_p, nc_l, nc_u = newcombe_ci(kA, nA, kB, nB)
+_, p_f = fisher_exact([[kA, nA - kA], [kB, nB - kB]], alternative="two-sided")
+print(f"\n--- CONFIRMAÇÃO (E1) ---")
+print(f"A: {kA}/{nA} ({kA/nA*100:.2f}%), Wilson [{wA[0]*100:.1f}%; {wA[1]*100:.1f}%]")
+print(f"B: {kB}/{nB} ({kB/nB*100:.2f}%), Wilson [{wB[0]*100:.1f}%; {wB[1]*100:.1f}%]")
+print(f"Dif (B-A): {dp_p*100:+.2f} p.p., Newcombe [{nc_l*100:+.1f}; {nc_u*100:+.1f}] p.p., Fisher p={p_f:.3f}")
 
 # ==========================================
-# 4. GRÁFICOS PADRONIZADOS EM PDF VETORIAL
+# 4. LISTAR FEEDBACKS REAIS PARA A TABELA 4.3
 # ==========================================
+fb = df[df["feedback"].notna() & (df["feedback"].astype(str).str.strip() != "")]
+print(f"\n--- FEEDBACKS NÃO VAZIOS: total={len(fb)} "
+      f"(A={sum(fb['experimental_group']=='A')}, B={sum(fb['experimental_group']=='B')}) ---")
+for grp in ["A", "B"]:
+    print(f"\n[Grupo {grp}]")
+    for idx, txt in enumerate(fb[fb["experimental_group"] == grp]["feedback"], 1):
+        print(f"  {idx}. {str(txt).strip()}")
 
+
+
+# ==========================================
+# 5. GERAÇÃO DOS GRÁFICOS EM PDF VETORIAL
+# ==========================================
 cores = ["#0072F0", "#F02020"]
 grupos = ["Grupo A (Texto)", "Grupo B (Visual)"]
+
+# Variáveis derivadas da seção 3 (Proporções E1)
+aceites = np.array([kA, kB], dtype=int)
+totais = np.array([nA, nB], dtype=int)
+props = aceites / totais
 
 plt.rcParams.update({
     "font.size": 10,
@@ -302,7 +202,7 @@ plt.close(fig)
 # --- Figura 4.2: Proporção de confirmação com IC 95% de Wilson ---
 fig, ax = plt.subplots(figsize=(6.8, 4.4))
 taxas = props * 100.0
-wilson_bounds = np.array([wilson_ci(k, n) for k, n in zip(aceites, totais)]) * 100.0
+wilson_bounds = np.array([wA, wB]) * 100.0
 yerr_wilson = np.vstack([
     np.maximum(0.0, taxas - wilson_bounds[:, 0]),
     np.maximum(0.0, wilson_bounds[:, 1] - taxas),
@@ -314,8 +214,9 @@ ax.errorbar(x, taxas, yerr=yerr_wilson, fmt="none", ecolor="black",
             elinewidth=1.4, capsize=6, capthick=1.4)
 
 for i, (barra, taxa, sup) in enumerate(zip(barras, taxas, wilson_bounds[:, 1])):
+    taxa_fmt = f"{taxa:.2f}%".replace(".", ",")
     ax.text(barra.get_x() + barra.get_width() / 2, sup + 1.5,
-            f"{taxa:.2f}%\n({aceites[i]}/{totais[i]})",
+            f"{taxa_fmt}\n({aceites[i]}/{totais[i]})",
             ha="center", va="bottom", fontsize=9.5)
 
 ax.set_xticks(x)
@@ -327,9 +228,12 @@ ax.set_title("Proporção de Confirmação por Grupo (IC 95% de Wilson)")
 ax.grid(axis="y", linestyle="--", alpha=0.35)
 ax.set_axisbelow(True)
 
+diff_fmt = f"{dp_p*100:+.2f}".replace(".", ",")
+nc_l_fmt = f"{nc_l*100:+.1f}".replace(".", ",")
+nc_u_fmt = f"{nc_u*100:+.1f}".replace(".", ",")
 nota_rodape = (
-    f"Diferença (B − A): {diff_p*100:+.2f} p.p. "
-    f"(IC 95% Newcombe: {nc_low*100:+.1f} a {nc_high*100:+.1f} p.p.)"
+    f"Diferença (B − A): {diff_fmt} p.p. "
+    f"(IC 95% Newcombe: {nc_l_fmt} a {nc_u_fmt} p.p.)"
 )
 fig.text(0.5, 0.01, nota_rodape, ha="center", va="bottom", fontsize=8.8)
 fig.tight_layout(rect=[0, 0.05, 1, 1])
